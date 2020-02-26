@@ -32,7 +32,7 @@ If you are using MAC OS X, CGAL can be installed by following way:
 
 ** Normal Modes **
 
-* The surface wave modal approximation code is from COMPUTER PROGRAM IN SEISMOLOGY wrote by Herrmann, R.B. (http://www.eas.slu.edu/eqc/eqccps.html). However, this code does not give the right Rayleigh/Love modes in the presence of low velocity layers (when vs is smaller than the top layer). In this case, we used the Generalised Reflection and Transmission mehtod by Chen, X.F. (Chen, X.F. 1993; Wu, B. and Chen, X.F. 2016).
+* The surface wave modal approximation code is from COMPUTER PROGRAM IN SEISMOLOGY wrote by Herrmann, R.B. (http://www.eas.slu.edu/eqc/eqccps.html).
 
 ** Fast Marching **
 
