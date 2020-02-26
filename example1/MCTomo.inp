@@ -1,0 +1,220 @@
+!
+! This is the input file for the MCTomo package.
+! It uses Fortran's namelist to input arguments. So every line begins with ! is a
+! comment. This document is well commented. Hope that you do not need to refer
+! any additional manual to use it.
+!
+! Grid settings
+!
+&GRID_SETTINGS
+ ! min max value of x(km) 
+ GRID%XMIN= -5.000000000000000     ,
+ GRID%XMAX=  5.000000000000000     ,
+ ! min max value of y(km)
+ GRID%YMIN= -5.00000000000000     ,
+ GRID%YMAX= 5.000000000000000     ,
+ ! min max value of z(km)
+ GRID%ZMIN=  0.0000000000000000     ,
+ GRID%ZMAX=  12.00000000000000     ,
+ ! grid size in x, y, z
+ GRID%NX=        101,
+ GRID%NY=        101,
+ GRID%NZ=        121,
+ ! water layer thickness (km), set to zero if no water layer
+ GRID%WATERDEPTH=     0,
+ ! scaling
+ GRID%SCALING= 1,
+ /
+!
+! Likelihood settings
+!
+&LIKELIHOOD_SETTINGS
+ ! 
+ ! data settings
+ !
+ ! datatype: 0 for P/S waves, 1 for P&S wave, 2 for surface waves and 3 for joint P&S and surface waves
+ LIKE_SET%DATATYPE=2,
+ ! sources file, receivers file and travel times file for body waves
+ LIKE_SET%BSOURCES_FILE='./bsources.dat',
+ LIKE_SET%BRECEIVERS_FILE='./breceivers.dat',
+ LIKE_SET%BDATA_FILE='./btimes.dat',
+ ! sources file, receivers file and travel times file for surface waves
+ LIKE_SET%SSOURCES_FILE='./sources.dat',
+ LIKE_SET%SRECEIVERS_FILE='./receivers.dat',
+ LIKE_SET%SDATA_FILE='./otimes.dat',
+ !
+ ! control parameters for surface modes calculation
+ !
+ ! phase velocity step for search phase velocities
+ LIKE_SET%DPHASEVEL=  1.00000000E-003,
+ ! 0 for love wave, 1 for rayleigh wave
+ LIKE_SET%RAYLOV=          1,
+ ! 0 for phase velocity, 1 for group velocity
+ LIKE_SET%PHASEGROUP=          0,
+ ! tolerance for search phase velocities
+ LIKE_SET%TOL=  1.0E-006,
+ !
+ ! fast marching settings
+ !
+ ! using straight rays(1) or not(0), only for surface waves
+ LIKE_SET%isStraight=     0,
+ ! dicing in x and y (refinement of grid), only for 2D fast marching
+ LIKE_SET%GRIDX=          1,
+ LIKE_SET%GRIDY=          1,
+ ! source refinement (1) or not (0), currently only for 2D fast marching
+ LIKE_SET%SGREF=          1,
+ ! dicing (refine level) and extent (from source) of source refinement
+ LIKE_SET%SGDIC=          4,
+ LIKE_SET%SGEXT=          8,
+ ! the order of fast marching, 0 for first order and 1 for mixed order (whenever second order is available, using second order)
+ LIKE_SET%ORDER=          1,
+ ! narrow band size (0-1) as fraction of nx*ny, if you cannot decide it, set to 1. Only for 2d fast marching
+ LIKE_SET%BAND= 0.50000000000000000     ,
+ ! If need to relocate the source locations, set to 1 meaning that we perform fast marching from 
+ ! receivers to sources and travel times can be easily draw from interpolation from travel time field. 
+ ! This provides fast forward calculation when changing source locations only.
+ LIKE_SET%DYNAMIC=          1,
+ /
+!
+! McMC settings
+!
+&MCMC_SETTINGS
+ ! 
+ ! General settings
+ !
+ ! randomly generate an initial model(0) or sampling an 1d initial model from file(1), or read voronoi cells from file(2)
+ MCMC_SET%INITIALISE=         0,
+ ! for generating a model whose velocities are linearly increasing with depth
+ MCMC_SET%INIT_VSMIN=         2,
+ MCMC_SET%INIT_VSMAX=         6,
+ ! initial model file (if initialise equal 1)
+ MCMC_SET%INITIAL_MODEL='initial_model.dat',
+ ! Chain id (used if mpi is not available)
+ MCMC_SET%PROCESSOR=         1,
+ ! Burn-in period. It is fine to change burn-in period when starting a run from the end point of previous running. 
+ ! Mase sure you reset it to be bigger than the total samples already generated. This will make the
+ ! code re-sample the chain after the new burn-in.
+ MCMC_SET%BURN_IN=          500000,
+ ! Thining of the chain i.e. retain every THINth model
+ MCMC_SET%THIN=             100,
+ ! total samples for current running
+ MCMC_SET%NSAMPLES=         400000,
+ ! running mode: 1 for the first running, >2 for continous running started from the end point of last running, 
+ ! 0 for resuming an occasionly interrupted running
+ MCMC_SET%RESUME=         1,
+ ! time step for displaying intermediate information of running
+ MCMC_SET%DISPLAY=       100,
+ ! time step for saving intermediate results in case to resume the running later
+ MCMC_SET%runtime_step=       100,
+ ! noise parameterisation, 0 for fixed noise, 1 for noise that is linearly related to time/source-receiver length
+ MCMC_SET%SIGDEP=          1,
+ ! 
+ ! Prior
+ !
+ ! Max. and Min. number of cells. The minimum number should be at least 4 for 3D Delaunay triangulation.
+ MCMC_SET%NCELL_MAX=                300,
+ MCMC_SET%NCELL_MIN=                  25,
+ ! Max. and Min Vp (km/s)
+ MCMC_SET%VPMIN=  3.0000000000000000     ,
+ MCMC_SET%VPMAX=  9.0000000000000000     ,
+ ! Max. and Min Vs (km/s)
+ MCMC_SET%VSMIN=  2.00000000000000000     ,
+ MCMC_SET%VSMAX=  6.0000000000000000     ,
+ ! Max. and Min density (g/cm3). This is not used, density is derived from Vp.
+ MCMC_SET%RHOMIN=  1.0000000000000000     ,
+ MCMC_SET%RHOMAX=  4.0000000000000000     ,
+ ! If noise level is not fixed. noise = n0*traveltime + n1.
+ ! Min. and Max. n0 value for body waves
+ MCMC_SET%BN0_MIN=  0.00001000000000000000   ,
+ MCMC_SET%BN0_MAX=  0.0500000000000000     ,
+ ! Min. and Max. n1 value for body waves
+ MCMC_SET%BN1_MIN=  0.000000000000000     ,
+ MCMC_SET%BN1_MAX=  0.2000000000000000     ,
+ ! Min. and Max. n0 value for surface waves
+ MCMC_SET%SN0_MIN=  0.00001000000000000000   ,
+ MCMC_SET%SN0_MAX=  0.0100000000000000     ,
+ ! Min. and Max. n1 value for surface waves
+ MCMC_SET%SN1_MIN=  0.000000000000000     ,
+ MCMC_SET%SN1_MAX=  0.03000000000000000     ,
+ !
+ ! Proposal distribution
+ !
+ ! Proposal kernel for birth/death step. 1 for a prior kernel and 0 for a Gaussian kernel.
+ ! Generally, a prior kernel is recommended.
+ MCMC_SET%KERNEL=          1,
+ ! Proposal standard deviation of Vp when change a velocity
+ ! sigma_vp is for the upper half part, sigma_vp2 is for lower half part
+ MCMC_SET%SIGMA_VP= 0.50000000000000000     ,
+ MCMC_SET%SIGMA_VP2= 1.0000000000000000     ,
+ ! Proposal standard deviation of Vs when change a velocity
+ ! sigma_vs is for the upper half part, sigma_vs2 is for lower half part
+ MCMC_SET%SIGMA_VS= 0.30000000000000000     ,
+ MCMC_SET%SIGMA_VS2= 0.30000000000000000     ,
+ ! Proposal standard deviation for density and birth step, not used actually
+ MCMC_SET%SIGMA_RHO=  5.00000000E-002,
+ MCMC_SET%SIGMA_RHO2=  5.00000000E-002,
+ ! Proposal standard deviation for n0 of body waves when change noise level
+ MCMC_SET%SIGMA_BN0=  1.00000000E-003,
+ ! Proposal standard deviation for n1 of body waves when change noise level
+ MCMC_SET%SIGMA_BN1=  1.00000000E-003,
+ ! Proposal standard deviation for n0 of surface waves when change noise level
+ MCMC_SET%SIGMA_SN0=  1.00000000E-003,
+ ! Proposal standard deviation for n1 of surface waves when change noise level
+ MCMC_SET%SIGMA_SN1=  1.00000000E-003,
+ ! Proposal standard deviaton for move step. sigma = pd*range
+ ! PD is for the upper half part, PD2 is for lower half part
+ MCMC_SET%PD=  5,
+ MCMC_SET%PD2= 8,
+ ! slice sampling
+ MCMC_SET%SLICESAMPLE = 0,
+ !
+ ! source locations. 
+ !
+ ! Source locations are generally well-determined using linearised inversion.
+ ! So the prior is chosen to be a small box centered at the initial location for a certain source.
+ ! xwidth, ywidth and zwidth is in km, twidth is in seconds.
+ MCMC_SET%LOCATE=  0,
+ MCMC_SET%XWIDTH=  1,
+ MCMC_SET%YWIDTH=  1,
+ MCMC_SET%ZWIDTH=  1,
+ MCMC_SET%TWIDTH=  0.5,
+ ! Proposal standard deviation for x, y, z of locations and origin time t
+ MCMC_SET%SIGMA_X=  0.2,
+ MCMC_SET%SIGMA_Y=  0.2,
+ MCMC_SET%SIGMA_Z=  0.2,
+ MCMC_SET%SIGMA_T=  0.02,
+ MCMC_SET%NLOC=  10,
+ !
+ ! hmc settings
+ !
+ ! using hmc step (1) or not (0)
+ ! not working for surface waves
+ MCMC_SET%HMC = 0,
+ MCMC_SET%N_LEAPFROGS = 50,
+ MCMC_SET%VP_STEP = 0.01,
+ MCMC_SET%VS_STEP = 0.01,
+ MCMC_SET%SRC_STEP = 0.01,
+ MCMC_SET%VP_MASS = 1,
+ MCMC_SET%VS_MASS = 1,
+ MCMC_SET%SRC_MASS = 1,
+ !
+ ! tempering related settings
+ !
+ ! Using parallel tempering (1) or not (0)
+ MCMC_SET%TEMPERING = 0,
+ ! The file stores temperatures
+ MCMC_SET%TEMPERFILE = 'temperature0.dat',
+ ! From where start the parallel tempering
+ MCMC_SET%TEMPERING_START = 500000,
+ ! Time step to perform parallel tempering. A small step will lead higher exchange rate but slower code
+ ! due to synchronization between chains. So an intermediate step (~100) is recommended.
+ MCMC_SET%TEMPERING_STEP = 100,
+ ! The jump type between different temperatures: 0, randomly choose a temperature;
+ ! 1, randomly choose a temperature between the two neighbours
+ ! 2, choose the nearest temperature
+ MCMC_SET%JUMP_TYPE= 0,
+ ! The number of chains whose temperature = 1
+ MCMC_SET%NUMBER_OF_1S= 16,
+ ! The total number of chains (including those with temperature 1)
+ MCMC_SET%NUMBER_OF_TEMPERATURES= 24,
+ /
