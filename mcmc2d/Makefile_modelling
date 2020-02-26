@@ -1,0 +1,148 @@
+# List of source code file
+obj = settings.o forward_modelling.o
+
+# Whether to run in debugging mode
+DEBUG = 
+
+# Openmp support
+OMP = 1
+
+# Set the compiler
+COMPILER_TYPE = intel
+
+# Set the specific compiler to be that defined in COMPILER_TYPE
+ifeq ($(COMPILER_TYPE),intel)
+F90 = ifort
+CC = icc
+endif
+
+ifeq ($(COMPILER_TYPE),gnu)
+F90 = gfortran
+CC = g++
+endif
+
+ifdef MPI
+F90 = mpif90
+FFLAGS += -DMPI
+endif
+
+# Archive toll
+AR = ar r
+
+# gfortran settings
+# =================
+ifeq ($(COMPILER_TYPE),gnu)
+#FFLAGS += -ffree-line-length-0 -cpp 
+FFLAGS += -ffree-line-length-0 -ffixed-line-length-0 -cpp
+#FFLAGS += -fopenmp
+
+ifdef DEBUG
+FFLAGS += -O0 -g -Wall -Wtabs -Wextra -Wconversion -fimplicit-none -fbacktrace -fcheck=all -ffpe-trap=zero,overflow,underflow -finit-real=nan 
+F77FLAGS = -O0 -g -ffree-line-length-0 -ffixed-line-length-0 -cpp
+CFLAGS += -O0 -g -frounding-math -Wall -Wextra -ansi -pedantic -Wc++0x-compat -Wlong-long -std=c++11 
+else
+FFLAGS += -Ofast -g
+CFLAGS += -Ofast -std=c++11 -frounding-math
+endif
+
+ifdef OMP
+CFLAGS += -fopenmp
+FFLAGS += -fopenmp
+endif
+
+endif
+
+# ifort settings
+# =================
+ifeq ($(COMPILER_TYPE),intel)
+FFLAGS += -extend-source -fpp
+
+ifdef DEBUG
+FFLAGS += -O0 -g -warn all -traceback -check all,noarg_temp_created -debug all -gen-interfaces -warn-interfaces
+#F77FLAGS = -O0 -g 
+CFLAGS += -O0 -g -std=c++11 -traceback -debug all
+else
+FFLAGS += -O3 -g
+CFLAGS += -O3 -std=c++11 
+endif
+
+ifdef OMP
+CFLAGS += -qopenmp
+FFLAGS += -qopenmp
+endif
+
+endif
+
+# Where bianries are stored
+BIN_DIR = .
+
+# Where forward modeling code are stored
+# Likelihood program
+LIKE3D = fmm3d
+LIKE2D = fmm2d
+SURF = surfmodes
+UTILS = utils
+
+# Where forward modeling code are stored
+LIKE2D_DIR = ../fm2d
+LIKE3D_DIR = ../fastmarching
+SURF_DIR = ../surfmodes
+UTILS_DIR = ../utils
+
+# Add forward modeling library to the program
+INCFLAGS += -I$(LIKE2D_DIR) -I$(LIKE3D_DIR) -I$(SURF_DIR) -I$(UTILS_DIR)
+LDFLAGS += -L$(LIKE2D_DIR) -L$(LIKE3D_DIR) -L$(SURF_DIR) -L$(UTILS_DIR)
+LIKE_DIR = ../fastmarching
+
+LDLIBS += -l$(LIKE2D) -l$(LIKE3D) -l$(SURF) -l$(UTILS)  -lm -lstdc++
+
+# likelihood library
+LIKE2D_LIB = $(patsubst %,lib%.a,$(LIKE2D))
+
+UTILS_LIB = libutils.a
+
+# Export variables
+export DEBUG F90 CC FFLAGS AR CFLAGS LIKE2D  LIKE2D_LIB UTILS_LIB
+
+
+#------------------------------------------------------------------------
+all :   $(LIKE2D_LIB) $(UTILS_LIB)   forward_modelling
+
+forward_modelling  :: $(obj) forward_modelling.o
+	$(F90) $(FFLAGS) $(LDFLAGS) $^  $(LDLIBS) -o $(BIN_DIR)/$@
+
+%.o : %.F90
+	$(F90) $(INCFLAGS) $(FFLAGS) -c -o $@ $<
+
+%.o : %.f90
+	$(F90) $(INCFLAGS) $(FFLAGS) -c -o $@ $<
+
+%.o : %.f
+	$(F90) $(F77FLAGS) -c -o $@ $<
+
+%.o : %.cpp
+	$(CC) $(CFLAGS) $(INCFLAGS)  -c -o $@ $< 
+	
+$(LIKE2D_LIB) : 
+	$(MAKE) -C $(LIKE2D_DIR) $@
+
+$(LIKE3D_LIB) : 
+	$(MAKE) -C $(LIKE3D_DIR) $@
+
+$(SURF_LIB) : 
+	$(MAKE) -C $(SURF_DIR) $@
+
+
+$(UTILS_LIB) :
+	$(MAKE) -C $(UTILS_DIR) $@
+
+clean: 
+	rm -f *.o *.mod
+	$(MAKE) -C $(LIKE2D_DIR) clean
+	$(MAKE) -C $(LIKE3D_DIR) clean
+	$(MAKE) -C $(SURF_DIR) clean
+
+cleanall: clean 
+	$(MAKE) -C $(LIKE2D_DIR) cleanall
+	$(MAKE) -C $(LIKE3D_DIR) cleanall
+	rm -f $(BIN_DIR)/MCTomo

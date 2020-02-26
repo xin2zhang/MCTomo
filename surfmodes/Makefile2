@@ -1,0 +1,47 @@
+# List of source code file
+obj = GRT.o Rayleigh.o util.o Love.o C_interval.o C_interval_L.o SearchRayleigh.o SearchLove.o surfdisp96.o surfmodes.o test.o
+
+# Whether to run in debugging mode
+DEBUG =  
+
+# bin dir
+BIN_DIR = .
+
+# Set the compiler
+F90 = gfortran
+CC = g++
+
+#F90 = ifort
+
+# gfortran settings
+# =================
+#FFLAGS += -ffree-line-length-0 -cpp 
+FFLAGS += -ffree-line-length-0 -ffixed-line-length-0 -cpp
+FFLAGS += -fopenmp
+
+ifdef DEBUG
+#FFLAGS += -O0 -g -Wall -Wtabs -Wextra -Wconversion -fimplicit-none -fbacktrace -fcheck=all -ffpe-trap=zero,overflow,underflow -finit-real=nan 
+FFLAGS += -O0 -g -Wall -Wtabs -Wextra -Wconversion -fimplicit-none -fbacktrace -fcheck=all -finit-real=nan 
+F77FLAGS = -O0 -g -ffree-line-length-0 -ffixed-line-length-0 -cpp
+CFLAGS += -O0 -g -std=c++11 -frounding-math -Wall -Wextra -ansi -pedantic
+else
+FFLAGS += -Ofast -g
+CFLAGS += -Ofast -std=c++11 -frounding-math
+endif
+
+all :: test
+
+test  :: $(obj)
+	$(F90) $(FFLAGS) $(LDFLAGS) $^  $(LDLIBS) -o $(BIN_DIR)/$@
+
+#disper.o : disper.f90 $(obj)
+#	$(F90) $(INCLIKE) $(INCFLAGS) $(FFLAGS) -c -o $@ $<
+
+%.o : %.f90
+	$(F90) $(INCLIKE) $(INCFLAGS) $(FFLAGS) -c -o $@ $<
+
+%.o : %.f
+	$(F90) $(INCLIKE) $(INCFLAGS) $(F77FLAGS) -c -o $@ $<
+
+clean: 
+	rm -f *.o *.mod
