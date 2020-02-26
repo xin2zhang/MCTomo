@@ -17,9 +17,12 @@ Compilation and installation
 
 * CGAL 4.8 or later ( for 3d delaunay and Voronoi support) CGAL can be downloaded from (http://www.cgal.org/) and can be built and installed following [CGAL installation manual] (http://doc.cgal.org/latest/Manual/installation.html). 
 
-  If you are using MAC OS X, CGAL can be installed by following way:
+If you are using MAC OS X, CGAL can be installed by following way:
+     
      sudo port install cgal
+  
   On debian/Ubuntu, 
+     
      sudo apt-get install libcgal-dev
 
 * NetCDF4 or later ( support for storaging the samples in a protable way ). If you do not have a netcdf4 library, you can install it through a package management program, such as rpm, yum, homebrew, macports, adept, and others.  Alternatively, you can download it from (http://www.unidata.ucar.edu/software/netcdf/docs/getting_and_building_netcdf.html).
