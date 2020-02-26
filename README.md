@@ -2,7 +2,7 @@
 
 **Authors:**
  - Xin Zhang x.zhang2@ed.ac.uk
- - Andrew Curtis andrew.curtis@ed.ac.uk
+ - Andrew Curtis
 
 ## MCTomo
 
