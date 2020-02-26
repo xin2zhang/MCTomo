@@ -1,0 +1,320 @@
+Start MCTomo at 20190801 154204.462...
+Reading input file...
+Reading sources, receivers and travel times...
+Ranseed= 4
+Generating an initial model...
+Generating...
+Generating an initial model takes: 0.0437
+Start rjmcmc sampling...
+Initial number of cells: 30
+Initial -loglikelihood: 86.7979
+Initial misfits: 109.5541
+Initial unweighted misfits: 34.1174
+
+Processor number: 4
+Sample: 100/500000
+Number of cells: 29
+-loglikelihood: 63.8086
+Weighted misfit: 66.6760
+Unweighted misfit: 20.5925
+
+Accpetance rate for velocity
+ARV 0.8571
+Accpetance rate for position
+ARP 0.8667
+Accpetance rate for deep velocity
+ARV NaN
+Accpetance rate for deep position
+ARP NaN
+Accpetance rate for birth
+ARB 0.5263
+Accpetance rate for death
+ARD 0.6875
+Accpetance rate for sigma change of body waves
+ARS 0.0000
+Likelihood calculation count
+Number of likelihood for slice sampling 100
+Rate of bad models
+Bad dispersion curves 0.0000
+Bad rays 0.0000
+---------------------------------------------------------
+
+Processor number: 4
+Sample: 200/500000
+Number of cells: 28
+-loglikelihood: 46.4155
+Weighted misfit: 42.2367
+Unweighted misfit: 12.1537
+
+Accpetance rate for velocity
+ARV 0.8602
+Accpetance rate for position
+ARP 0.7879
+Accpetance rate for deep velocity
+ARV NaN
+Accpetance rate for deep position
+ARP NaN
+Accpetance rate for birth
+ARB 0.6000
+Accpetance rate for death
+ARD 0.7188
+Accpetance rate for sigma change of body waves
+ARS 0.8571
+Likelihood calculation count
+Number of likelihood for slice sampling 193
+Rate of bad models
+Bad dispersion curves 0.0000
+Bad rays 0.0000
+---------------------------------------------------------
+
+Processor number: 4
+Sample: 300/500000
+Number of cells: 28
+-loglikelihood: 45.7789
+Weighted misfit: 37.7422
+Unweighted misfit: 10.6201
+
+Accpetance rate for velocity
+ARV 0.8643
+Accpetance rate for position
+ARP 0.8400
+Accpetance rate for deep velocity
+ARV NaN
+Accpetance rate for deep position
+ARP NaN
+Accpetance rate for birth
+ARB 0.6078
+Accpetance rate for death
+ARD 0.6735
+Accpetance rate for sigma change of body waves
+ARS 0.8000
+Likelihood calculation count
+Number of likelihood for slice sampling 286
+Rate of bad models
+Bad dispersion curves 0.0000
+Bad rays 0.0000
+---------------------------------------------------------
+
+Processor number: 4
+Sample: 400/500000
+Number of cells: 28
+-loglikelihood: 40.8549
+Weighted misfit: 34.8315
+Unweighted misfit: 9.2242
+
+Accpetance rate for velocity
+ARV 0.8511
+Accpetance rate for position
+ARP 0.8730
+Accpetance rate for deep velocity
+ARV NaN
+Accpetance rate for deep position
+ARP NaN
+Accpetance rate for birth
+ARB 0.6027
+Accpetance rate for death
+ARD 0.7188
+Accpetance rate for sigma change of body waves
+ARS 0.7500
+Likelihood calculation count
+Number of likelihood for slice sampling 378
+Rate of bad models
+Bad dispersion curves 0.0000
+Bad rays 0.0000
+---------------------------------------------------------
+
+Processor number: 4
+Sample: 500/500000
+Number of cells: 27
+-loglikelihood: 37.2832
+Weighted misfit: 30.2587
+Unweighted misfit: 8.3631
+
+Accpetance rate for velocity
+ARV 0.8511
+Accpetance rate for position
+ARP 0.8333
+Accpetance rate for deep velocity
+ARV NaN
+Accpetance rate for deep position
+ARP NaN
+Accpetance rate for birth
+ARB 0.6180
+Accpetance rate for death
+ARD 0.6988
+Accpetance rate for sigma change of body waves
+ARS 0.8000
+Likelihood calculation count
+Number of likelihood for slice sampling 470
+Rate of bad models
+Bad dispersion curves 0.0000
+Bad rays 0.0000
+---------------------------------------------------------
+
+Processor number: 4
+Sample: 600/500000
+Number of cells: 30
+-loglikelihood: 40.4791
+Weighted misfit: 35.2969
+Unweighted misfit: 9.6298
+
+Accpetance rate for velocity
+ARV 0.8643
+Accpetance rate for position
+ARP 0.8022
+Accpetance rate for deep velocity
+ARV NaN
+Accpetance rate for deep position
+ARP NaN
+Accpetance rate for birth
+ARB 0.6355
+Accpetance rate for death
+ARD 0.6667
+Accpetance rate for sigma change of body waves
+ARS 0.7500
+Likelihood calculation count
+Number of likelihood for slice sampling 560
+Rate of bad models
+Bad dispersion curves 0.0000
+Bad rays 0.0000
+---------------------------------------------------------
+
+Processor number: 4
+Sample: 700/500000
+Number of cells: 36
+-loglikelihood: 36.2702
+Weighted misfit: 33.4139
+Unweighted misfit: 8.5042
+
+Accpetance rate for velocity
+ARV 0.8624
+Accpetance rate for position
+ARP 0.8155
+Accpetance rate for deep velocity
+ARV NaN
+Accpetance rate for deep position
+ARP NaN
+Accpetance rate for birth
+ARB 0.6772
+Accpetance rate for death
+ARD 0.6667
+Accpetance rate for sigma change of body waves
+ARS 0.7391
+Likelihood calculation count
+Number of likelihood for slice sampling 653
+Rate of bad models
+Bad dispersion curves 0.0000
+Bad rays 0.0000
+---------------------------------------------------------
+
+Processor number: 4
+Sample: 800/500000
+Number of cells: 30
+-loglikelihood: 37.5067
+Weighted misfit: 33.3090
+Unweighted misfit: 10.2060
+
+Accpetance rate for velocity
+ARV 0.8690
+Accpetance rate for position
+ARP 0.8051
+Accpetance rate for deep velocity
+ARV NaN
+Accpetance rate for deep position
+ARP NaN
+Accpetance rate for birth
+ARB 0.6549
+Accpetance rate for death
+ARD 0.6643
+Accpetance rate for sigma change of body waves
+ARS 0.7692
+Likelihood calculation count
+Number of likelihood for slice sampling 750
+Rate of bad models
+Bad dispersion curves 0.0000
+Bad rays 0.0000
+---------------------------------------------------------
+
+Processor number: 4
+Sample: 900/500000
+Number of cells: 27
+-loglikelihood: 32.8140
+Weighted misfit: 30.7325
+Unweighted misfit: 10.0419
+
+Accpetance rate for velocity
+ARV 0.8833
+Accpetance rate for position
+ARP 0.8015
+Accpetance rate for deep velocity
+ARV NaN
+Accpetance rate for deep position
+ARP NaN
+Accpetance rate for birth
+ARB 0.6667
+Accpetance rate for death
+ARD 0.6813
+Accpetance rate for sigma change of body waves
+ARS 0.7333
+Likelihood calculation count
+Number of likelihood for slice sampling 845
+Rate of bad models
+Bad dispersion curves 0.0000
+Bad rays 0.0000
+---------------------------------------------------------
+
+Processor number: 4
+Sample: 1000/500000
+Number of cells: 24
+-loglikelihood: 31.8465
+Weighted misfit: 33.3620
+Unweighted misfit: 9.6447
+
+Accpetance rate for velocity
+ARV 0.8844
+Accpetance rate for position
+ARP 0.8121
+Accpetance rate for deep velocity
+ARV NaN
+Accpetance rate for deep position
+ARP NaN
+Accpetance rate for birth
+ARB 0.6667
+Accpetance rate for death
+ARD 0.6667
+Accpetance rate for sigma change of body waves
+ARS 0.7576
+Likelihood calculation count
+Number of likelihood for slice sampling 940
+Rate of bad models
+Bad dispersion curves 0.0000
+Bad rays 0.0000
+---------------------------------------------------------
+
+Processor number: 4
+Sample: 1100/500000
+Number of cells: 30
+-loglikelihood: 30.5065
+Weighted misfit: 27.2593
+Unweighted misfit: 7.0405
+
+Accpetance rate for velocity
+ARV 0.8874
+Accpetance rate for position
+ARP 0.8182
+Accpetance rate for deep velocity
+ARV NaN
+Accpetance rate for deep position
+ARP NaN
+Accpetance rate for birth
+ARB 0.6737
+Accpetance rate for death
+ARD 0.6564
+Accpetance rate for sigma change of body waves
+ARS 0.7429
+Likelihood calculation count
+Number of likelihood for slice sampling 1036
+Rate of bad models
+Bad dispersion curves 0.0000
+Bad rays 0.0000
+---------------------------------------------------------
