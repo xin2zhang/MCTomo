@@ -30,28 +30,28 @@ If you are using MAC OS X, CGAL can be installed by following way:
 
 ## Algorithms and Dependencies
 
-** Normal Modes **
+**Normal Modes**
 
 * The surface wave modal approximation code is from COMPUTER PROGRAM IN SEISMOLOGY wrote by Herrmann, R.B. (http://www.eas.slu.edu/eqc/eqccps.html).
 
-** Fast Marching **
+**Fast Marching**
 
 * The code used the fast marching method to calculate the first arrival times. The 2D fast marching code is from Nick Rawlinson (http://rses.anu.edu.au/seismology/soft/fmmcode/). For the 3D body wave tomography, we used a general N-dimensional fast marching code by Gomez, J.V. and Pardeiro, J. (https://github.com/jvgomez/fast_methods). Both of them are revised for our usage.
 
-** 3D Voronoi **
+**3D Voronoi**
 
 * The 3D Voronoi tessellation is calculated based on CGAL (see above). However, we still used the KD-tree method to convert the Voronoi diagram to a regular grid based representation (https://github.com/jmhodges/kdtree2).
 
 ## Compilation
 
-* Add your cgal include path (e.g. MYCGAL/include) and link path in the src/makefile
-* If available and necessary, add your netcdf include path and link path in the src/makefile
+* Add your cgal include path (e.g. MYCGAL/include) and link path in the *src/makefile*
+* If available and necessary, add your netcdf include path and link path in the *src/makefile*
 * Then in the src directory
 
-## Examples
-Examples are in the examples directory:
+      make
 
-make
+## Examples
+Examples are in the examples directory
 
 ## References
 
