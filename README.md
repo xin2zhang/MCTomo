@@ -44,12 +44,14 @@ If you are using MAC OS X, CGAL can be installed by following way:
 
 ## Compilation
 
-* Add your cgal include path (e.g. MYCGAL/include) and link path in the makefile
-* If available and necessary, add your netcdf include path and link path in the makefile
-* Then make
+* Add your cgal include path (e.g. MYCGAL/include) and link path in the src/makefile
+* If available and necessary, add your netcdf include path and link path in the src/makefile
+* Then in the src directory
 
 ## Examples
-Examples are in the examples directory
+Examples are in the examples directory:
+
+make
 
 ## References
 
