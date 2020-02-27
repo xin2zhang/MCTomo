@@ -53,20 +53,6 @@ Examples are in the examples directory
 
 ## References
 
-CGAL, Computational Geometry Algorithms Library, http://www.cgal.org.
-
-Chen, X. (1993). A systematic and efficient method of computing normal modes for multilayered half-space. Geophysical Journal International, 115(2), 391-409.
-
-Herrmann, R. B. (2013). Computer programs in seismology: An evolving tool for instruction and research. Seismological Research Letters, 84(6), 1081-1088.
-
-Kennel, M. B. (2004). KDTREE 2: Fortran 95 and C++ software to efficiently search for near neighbors in a multi-dimensional Euclidean space. arXiv preprint physics/0408067.
-
-Rawlinson, N., & Sambridge, M. (2004). Wave front evolution in strongly heterogeneous layered media using the fast marching method. Geophysical Journal International, 156(3), 631-647.
-
-Valero-Gomez, A., Gomez, J. V., Garrido, S., & Moreno, L. (2013). The path to efficiency: fast marching method for safer, more efficient mobile robot trajectories. IEEE Robotics & Automation Magazine, 20(4), 111-120.
-
-Wu, B., & Chen, X. (2016). Stable, accurate and efficient computation of normal modes for horizontal stratified models. Geophysical Journal International, 206(2), 1281-1300.
-
 Zhang, X., Curtis, A., Galetti, E., & de Ridder, S., 2018. 3-D Monte Carlo surface wave tomography, Geophysical Journal International, 215(3), 1644–1658.
 
 Zhang, X., Hansteen, F., Curtis, A., & de Ridder, S., 2019a. 1D, 2D and 3D Monte Carlo ambient noise tomography using a dense passive seismic array installed on the North Sea seabed, Journal of Geophysical
