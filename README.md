@@ -1,14 +1,9 @@
-3D Monte Carlo Tomography 
-============================
-
-**Authors:**
- - Xin Zhang x.zhang2@ed.ac.uk
- - Andrew Curtis
-
 MCTomo
 ============================
 3D Monte Carlo tomography package using reversible jump McMC method and 3D Voronoi tessellation.
-
+**Authors:**
+ - Xin Zhang x.zhang2@ed.ac.uk
+ - Andrew Curtis
 
 ## Requirements
 
