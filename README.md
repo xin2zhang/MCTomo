@@ -52,11 +52,9 @@ Examples are in the examples directory
 
 Zhang, X., Curtis, A., Galetti, E., & de Ridder, S., 2018. 3-D Monte Carlo surface wave tomography, Geophysical Journal International, 215(3), 1644–1658.
 
-Zhang, X., Hansteen, F., Curtis, A., & de Ridder, S., 2019a. 1D, 2D and 3D Monte Carlo ambient noise tomography using a dense passive seismic array installed on the North Sea seabed, Journal of Geophysical
-Research: Solid Earth.
+Zhang, X., Hansteen, F., Curtis, A., & de Ridder, S., 2020. 1D, 2D and 3D Monte Carlo ambient noise tomography using a dense passive seismic array installed on the North Sea seabed, Journal of Geophysical Research: Solid Earth, 125, e2019JB018552. 
 
-Zhang, X., Roy, C., Curtis, A., Nowacki, A., & Baptie, B., 2019b. 3D Tomographic Monte Carlo joint inversion of earthquake body wave travel times and ambient noise surface wave dispersion – imaging the
-subsurface using induced seismicity and ambient noise, submitted.
+Zhang, X., Roy, C., Curtis, A., Nowacki, A., & Baptie, B., 2020. Imaging the subsurface using induced seismicity and ambient noise: 3D Tomographic Monte Carlo joint inversion of earthquake body wave travel times and ambient noise surface wave dispersion, Geophysical Journal International.
 
 
 
