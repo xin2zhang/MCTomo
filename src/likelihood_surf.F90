@@ -436,14 +436,14 @@ contains
                     rays(n,i)%revid = k
                     if( dat%raystat(n,1,i)==1 )then
                         rays(n,i)%npoints = floor(dist(n,i)/dl) + 1
-                        allocate( rays(n,i)%points(rays(n,i)%npoints,2) )
+                        allocate( rays(n,i)%points(2, rays(n,i)%npoints) )
                         do l = 1, rays(n,i)%npoints-1
-                            rays(n,i)%points(l,1) = dat%src(1,j) + (l-1)*dl*dx/ds
-                            rays(n,i)%points(l,2) = dat%src(2,j) + (l-1)*dl*dy/ds
-                            if(out_bnd(rays(n,i)%points(l,:),bnd)) &
+                            rays(n,i)%points(1,l) = dat%src(1,j) + (l-1)*dl*dx/ds
+                            rays(n,i)%points(2,l) = dat%src(2,j) + (l-1)*dl*dy/ds
+                            if(out_bnd(rays(n,i)%points(:,l),bnd)) &
                                 call exception_raiseError('Straight ray out of area') 
                         enddo
-                        rays(n,i)%points(rays(n,i)%npoints,:) = dat%rev(:,k)
+                        rays(n,i)%points(:,rays(n,i)%npoints) = dat%rev(:,k)
                     endif
                 enddo
             enddo

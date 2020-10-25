@@ -145,9 +145,7 @@ contains
         real( kind=ii10 ), dimension(:), intent(in) :: coord
         real( kind=ii10 ), dimension(:), intent(in) :: bnd
     
-        if( coord(1) < bnd(1) .or. coord(1) > bnd(2) &
-        .or. coord(2) < bnd(3) .or. coord(2) > bnd(4)&
-        .or. coord(3) < bnd(5) .or. coord(3) >bnd (6)) then
+        if( any(coord < bnd(1:size(bnd):2)) .or. any(coord > bnd(2:size(bnd):2)) )then
             out_bnd = .true.
         else
             out_bnd = .false.
