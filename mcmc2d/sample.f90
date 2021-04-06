@@ -11,7 +11,6 @@ module m_sample
     use run_info, only          : T_SAMPLE, T_RUN_INFO
     ! use all the available procedure, types and variable in the following
     ! module
-    use cgal_delaunay
     use iso_c_binding
     implicit none
 
@@ -26,14 +25,15 @@ module m_sample
     ! static values
     integer, parameter, public :: temp_unit = 7
     integer, parameter, public :: sample_unit = 9
+    integer, parameter, public :: NZ = 1
 
     type T_OUT
         integer :: nthin
-        real(kind=16), dimension(:,:,:), allocatable :: aveS
-        real(kind=16), dimension(:,:,:), allocatable :: stdS
-        real(kind=16), dimension(:,:,:), allocatable :: aveP
-        real(kind=16), dimension(:,:,:), allocatable :: stdP
-        real(kind=ii10), dimension(:,:,:,:), allocatable :: postS
+        real(kind=16), dimension(:,:), allocatable :: aveS
+        real(kind=16), dimension(:,:), allocatable :: stdS
+        real(kind=16), dimension(:,:), allocatable :: aveP
+        real(kind=16), dimension(:,:), allocatable :: stdP
+        real(kind=ii10), dimension(:,:,:), allocatable :: postS
         !TODO : other output, like evidence of number of cells
     endtype
 
@@ -45,11 +45,11 @@ contains
         type(T_GRID), intent(in) :: grid
         integer, intent(in) :: nv
 
-        allocate( output%aveS(grid%nz,grid%ny,grid%nx) )
-        allocate( output%stdS(grid%nz,grid%ny,grid%nx) )
-        allocate( output%aveP(grid%nz,grid%ny,grid%nx) )
-        allocate( output%stdP(grid%nz,grid%ny,grid%nx) )
-        allocate( output%postS(nv,grid%nz,grid%ny,grid%nx) )
+        allocate( output%aveS(grid%ny,grid%nx) )
+        allocate( output%stdS(grid%ny,grid%nx) )
+        allocate( output%aveP(grid%ny,grid%nx) )
+        allocate( output%stdP(grid%ny,grid%nx) )
+        allocate( output%postS(nv,grid%ny,grid%nx) )
 
         output%nthin = 0
         output%aveS = 0.0
@@ -66,7 +66,7 @@ contains
         type(T_SAMPLE), intent(in)      :: sample
         type(T_RUN_INFO), intent(inout) :: RTI
 
-        real(kind=ii10), dimension(3,size(RTI%points,2)) :: points_copy
+        real(kind=ii10), dimension(2,size(RTI%points,2)) :: points_copy
         real(kind=ii10), dimension(3,size(RTI%parameters,2)) :: parameters_copy
 
         ! not accepted, return
@@ -93,16 +93,8 @@ contains
             RTI%parameters(:,sample%vindex) = sample%values
 
         case(5)
-            RTI%bnoise0(sample%vindex) = sample%noise0
-            RTI%bnoise1(sample%vindex) = sample%noise1
-
-        case(6)
             RTI%snoise0(sample%vindex) = sample%noise0
             RTI%snoise1(sample%vindex) = sample%noise1
-
-        case(7)
-            RTI%locations(1:3,sample%vindex) = sample%coord
-            RTI%locations(4,sample%vindex) = sample%values(1)
 
         case default
             call exception_raiseError("wrong proposal type (1 for birth, 2&
@@ -162,16 +154,14 @@ contains
     subroutine write_doubles(arr,str,n)
         use m_utils, only : write_resume_unit, double_format
         implicit none
-        real(kind=16),dimension(:,:,:), intent(in) :: arr
+        real(kind=16),dimension(:,:), intent(in) :: arr
         integer, intent(in),dimension(size(arr,2)),optional :: n
         character(len=*), intent(in),optional :: str
-        integer :: i, j, k
+        integer :: i, j
 
         if(present(str)) write(write_resume_unit,'("'//trim(str)//'")')
-        do i=1,size(arr,3)
-            do j = 1, size(arr,2)
-                write(write_resume_unit,double_format(size(arr,1))) arr(:,j,i)
-            enddo
+        do i=1,size(arr,2)
+            write(write_resume_unit,double_format(size(arr,1))) arr(:,i)
         end do
 
     end subroutine write_doubles
@@ -183,10 +173,10 @@ contains
         character(len=*), intent(in) :: prefix
 
         character(len=:), allocatable :: str
-        real(kind=16), dimension(:,:,:), allocatable :: stdS, stdP
+        real(kind=16), dimension(:,:), allocatable :: stdS, stdP
 
-        allocate( stdS(size(output%aveS,1),size(output%aveS,2),size(output%aveS,3)) )
-        allocate( stdP(size(output%aveP,1),size(output%aveP,2),size(output%aveP,3)) )
+        allocate( stdS(size(output%aveS,1),size(output%aveS,2)) )
+        allocate( stdP(size(output%aveP,1),size(output%aveP,2)) )
 
         stdS = output%stdS - output%aveS**2
         stdP = output%stdP - output%aveP**2
@@ -203,15 +193,13 @@ contains
 
         ! average
         open(unit=write_resume_unit,file=trim(results_dir)//FILEDIR_SEPARATOR//prefix//'_average.dat',status='replace',action='write')
-        str = itoa(size(output%aveS,1))//' '//itoa(size(output%aveS,2))&
-            &//' '//itoa(size(output%aveS,3)*2)
+        str = itoa(size(output%aveS,1))//' '//itoa(size(output%aveS,2)) 
         call write_doubles(output%aveP,str)
         call write_doubles(output%aveS)
         close(write_resume_unit)
         ! standard deviation
         open(unit=write_resume_unit,file=trim(results_dir)//FILEDIR_SEPARATOR//prefix//'_std.dat',status='replace',action='write')
-        str = itoa(size(output%aveS,1))//' '//itoa(size(output%aveS,2))&
-            &//' '//itoa(size(output%aveS,3)*2)
+        str = itoa(size(output%aveS,1))//' '//itoa(size(output%aveS,2)) 
         call write_doubles(stdP,str)
         call write_doubles(stdS)
         close(write_resume_unit)
@@ -237,7 +225,6 @@ program sample
                                                 init_samples, init_run_info
     use m_mcmc,                         only : kdtree_to_grid, ImportanceSample
     use read_write,                     only : read_vertices, write_vertices, read_temperatures0
-    use cgal_delaunay,                  only : p3, d3
 
     ! use all the available procedure, types and variable in the following
     ! module
@@ -263,7 +250,7 @@ program sample
     ! grid tesselation
     type(T_GRID) :: grid
     type(T_MOD)  :: model
-    type(d3) :: bnd_box(2)
+    !type(d3) :: bnd_box(2)
 
     ! samples
     type(T_SAMPLE), dimension(:), allocatable  :: samples
@@ -272,8 +259,8 @@ program sample
     ! tempering
     real(c_double), dimension(:,:), allocatable :: temperatures
     real(c_double), dimension(:), allocatable :: temperatures0
-    real(kind=16), dimension(:,:,:,:), allocatable :: tvp, tvs
-    real(kind=16), dimension(:,:,:,:), allocatable :: tvarp, tvars
+    real(kind=16), dimension(:,:,:), allocatable :: tvp, tvs
+    real(kind=16), dimension(:,:,:), allocatable :: tvarp, tvars
     real(kind=16), dimension(:), allocatable :: tnormalise
     integer, dimension(:), allocatable :: tnthin
     integer idx, ntemperatures, nthin, totalSamples ! num of temperatures not equal to 1
@@ -322,8 +309,8 @@ program sample
     call grid_setup(grid)
     mcmc_set%grid = grid
     mcmc_set%datatype = like_set%datatype
-    bnd_box(1) = d3(grid%xmin,grid%ymin,grid%zmin)
-    bnd_box(2) = d3(grid%xmax,grid%ymax,grid%zmax)
+    !bnd_box(1) = d3(grid%xmin,grid%ymin,grid%zmin)
+    !bnd_box(2) = d3(grid%xmax,grid%ymax,grid%zmax)
     
     ! read data
     allocate(dat(2))
@@ -331,9 +318,9 @@ program sample
 
     call init_run_info(RTI,dat,mcmc_set)
     ! initialize and allocate several variables related to grid
-    allocate( model%vp(grid%nz,grid%ny,grid%nx) )
-    allocate( model%vs(grid%nz,grid%ny,grid%nx) )
-    allocate( model%rho(grid%nz,grid%ny,grid%nx) )
+    allocate( model%vp(grid%ny,grid%nx) )
+    allocate( model%vs(grid%ny,grid%nx) )
+    allocate( model%rho(grid%ny,grid%nx) )
     model%vp = 0
     model%vs = 0
     model%rho = 0
@@ -343,10 +330,10 @@ program sample
     ! better
     if(mcmc_set%tempering == 1)then
         ntemperatures = mcmc_set%number_of_temperatures - mcmc_set%number_of_1s
-        allocate(tvp(grid%nz,grid%ny,grid%nx,ntemperatures))
-        allocate(tvs(grid%nz,grid%ny,grid%nx,ntemperatures))
-        allocate(tvarp(grid%nz,grid%ny,grid%nx,ntemperatures))
-        allocate(tvars(grid%nz,grid%ny,grid%nx,ntemperatures))
+        allocate(tvp(grid%ny,grid%nx,ntemperatures))
+        allocate(tvs(grid%ny,grid%nx,ntemperatures))
+        allocate(tvarp(grid%ny,grid%nx,ntemperatures))
+        allocate(tvars(grid%ny,grid%nx,ntemperatures))
         tvp = 0
         tvs = 0
         tvarp = 0
@@ -417,7 +404,7 @@ program sample
                         !cnorm = -0.95*samples(iter)%like
 
                     endif
-                    call kdtree_to_grid(RTI,grid,bnd_box,model)
+                    call kdtree_to_grid(RTI,grid,model)
                     if(abs(temperatures(4,iter) - 1.0)<eps)then
                         output%aveS = output%aveS + model%vs
                         output%stdS = output%stdS + model%vs**2
@@ -427,10 +414,10 @@ program sample
                     else
                         idx=minloc(abs(temperatures0-temperatures(4,iter)),1)
                         weight = ImportanceSample(temperatures(4,iter),-samples(iter)%like,norm)
-                        tvp(:,:,:,idx) = tvp(:,:,:,idx) + weight * model%vp
-                        tvs(:,:,:,idx) = tvs(:,:,:,idx) + weight * model%vs
-                        tvarp(:,:,:,idx) = tvarp(:,:,:,idx) + weight * model%vp**2
-                        tvars(:,:,:,idx) = tvars(:,:,:,idx) + weight * model%vs**2
+                        tvp(:,:,idx) = tvp(:,:,idx) + weight * model%vp
+                        tvs(:,:,idx) = tvs(:,:,idx) + weight * model%vs
+                        tvarp(:,:,idx) = tvarp(:,:,idx) + weight * model%vp**2
+                        tvars(:,:,idx) = tvars(:,:,idx) + weight * model%vs**2
                         tnormalise(idx) = tnormalise(idx) + weight
                         tnthin(idx) = tnthin(idx) + 1
                     endif
@@ -472,10 +459,10 @@ program sample
         do i = 1, ntemperatures
             weight = tnthin(i)*1.0/totalSamples
             if(tnthin(i)>0 .and. tnormalise(i)>0)then
-                output%aveP = output%aveP + tvp(:,:,:,i)/tnormalise(i) * weight
-                output%aveS = output%aveS + tvs(:,:,:,i)/tnormalise(i) * weight
-                output%stdP = output%stdP + tvarp(:,:,:,i)/tnormalise(i) * weight
-                output%stdS = output%stdS + tvars(:,:,:,i)/tnormalise(i) * weight
+                output%aveP = output%aveP + tvp(:,:,i)/tnormalise(i) * weight
+                output%aveS = output%aveS + tvs(:,:,i)/tnormalise(i) * weight
+                output%stdP = output%stdP + tvarp(:,:,i)/tnormalise(i) * weight
+                output%stdS = output%stdS + tvars(:,:,i)/tnormalise(i) * weight
             endif
         enddo
         call log_msg('Output posterior information from importance sampling...')

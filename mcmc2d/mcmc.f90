@@ -1694,14 +1694,16 @@ contains
     ! importance sampling, i.e. weight average through all temperatures
     ! generally, a solution of reverse logistic regression would be better. But
     ! it is more obvious to implement after sampling
-    function ImportanceSample(temperature,loglike) result(w)
+    function ImportanceSample(temperature,loglike,norm) result(w)
         implicit none
         real(kind=ii10), intent(in) :: temperature
         real(kind=ii10), intent(in) :: loglike
+        real(kind=ii10), intent(in) :: norm
         real(kind=16) :: w
 
-        w = exp(loglike*(1.0-temperature))
+        w = exp(loglike*(1.0-1.0/temperature)-norm*(1.0-1.0/temperature))
 
+        !print *, w
         if(w /= w)then
             call log_msg('loglike: '//rtoa(loglike))
             call log_msg('temperature: '//rtoa(temperature))
