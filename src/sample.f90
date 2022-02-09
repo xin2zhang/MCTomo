@@ -438,7 +438,7 @@ program sample
     call output_setup(output,grid,nv)
     call init_samples(samples)
     temperatures = 1.0
-    tnthin = 0
+    if(mcmc_set%tempering == 1) tnthin = 0
     do ichain = 1, nchains
         call log_msg('Processing chain '//itoa(chains(ichain))//' ...')
         ! read the initial vertices from file
