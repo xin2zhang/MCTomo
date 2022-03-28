@@ -349,6 +349,7 @@ program sample
     ! if parallel tempering, allocate and initialise vp, vs for importance
     ! sampling TODO: using a solution of reverse logistic regression would be
     ! better
+    ntemperatures = 0
     if(mcmc_set%tempering == 1)then
         ntemperatures = mcmc_set%number_of_temperatures - mcmc_set%number_of_1s
         allocate(tvp(grid%nz,grid%ny,grid%nx,ntemperatures))

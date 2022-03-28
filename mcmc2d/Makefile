@@ -129,13 +129,13 @@ export DEBUG F90 CC FFLAGS F77FLAGS AR CFLAGS LIKE2D LIKE2D_LIB UTILS_LIB SURF_L
 
 
 #------------------------------------------------------------------------
-all :   $(LIKE2D_LIB) $(UTILS_LIB)  $(SURF_LIB)   MCTomo2d
+all :   $(LIKE2D_LIB) $(UTILS_LIB)  $(SURF_LIB)   MCTomo2d sample
 
 MCTomo2d  :: $(obj) MCTomo.o
 	$(F90) $(FFLAGS) $(LDFLAGS) $^  $(LDLIBS) -o $(BIN_DIR)/$@
 
-#sample    :: $(obj) sample.o
-#	$(F90) $(FFLAGS) $(LDFLAGS) $^  $(LDLIBS) -o $(BIN_DIR)/$@
+sample    :: $(obj) sample.o
+	$(F90) $(FFLAGS) $(LDFLAGS) $^  $(LDLIBS) -o $(BIN_DIR)/$@
 
 %.o : %.F90
 	$(F90) $(INCLIKE) $(INCFLAGS) $(FFLAGS) -c -o $@ $<
