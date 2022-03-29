@@ -3,7 +3,7 @@
 module m_settings
 
     use iso_c_binding, only : c_size_t, c_int
-    use m_utils, only : ii10, STRLEN, itoa
+    use m_utils, only : ii10, STRLEN, itoa, eps
     use m_exception,only : exception_raiseError
     use m_logger, only          : log_msg
     implicit none
@@ -24,12 +24,14 @@ module m_settings
         real( kind=ii10 ) :: zmin, zmax
         real( kind=ii10 ) :: dx, dy, dz
         real( kind=ii10 ) :: waterDepth
+        character(len=STRLEN) :: waterDepthFile
         real( kind=ii10 ) :: scaling
     endtype
 
     ! model
     type T_MOD
         real( kind=ii10 ), dimension(:,:,:), allocatable :: vp, vs, rho
+        real( kind=ii10 ), dimension(:,:), allocatable :: waterdepth
     end type T_MOD
 
     ! mcmc settings
@@ -129,6 +131,7 @@ contains
 
         !type(T_GRID) grid
         !grid = mcmc_set%grid
+        integer ierr
 
         allocate( model%vp(grid%nz, grid%ny, grid%nx) )
         allocate( model%vs(grid%nz, grid%ny, grid%nx) )
@@ -138,7 +141,40 @@ contains
         model%vs = 1.0
         model%rho = 1.0
 
+        allocate(model%waterdepth(grid%ny, grid%nx))
+        model%waterdepth = 0
+        if(grid%waterDepth<eps)then
+            call read_waterdepth(grid%waterdepthfile,model%waterdepth,ierr)
+        endif
+        if(ierr /= 0)then
+            model%waterdepth = grid%waterDepth
+        endif
+
     end subroutine mod_setup
+
+    subroutine read_waterdepth(filename,waterdepth,ierr)
+        use m_utils, only : read_resume_unit
+        implicit none
+        character( len=* ), intent(in) :: filename
+        real(kind=ii10), dimension(:,:), intent(out) :: waterdepth
+        integer, intent(out) :: ierr
+
+        integer i
+        
+        ierr = 0
+        open(unit=read_resume_unit,file=filename,status='old',action='read')
+        do i = 1, size(waterdepth,2)
+            read(read_resume_unit,*,iostat=ierr) waterdepth(:,i) 
+            if(ierr /= 0)then
+                call log_msg('Reading water depth error! Set waterdepth to a scalar value provided in waterDepth!')
+                waterdepth = 0
+                exit
+            endif
+        enddo
+        close(read_resume_unit)
+
+    end subroutine
+
 
     logical function out_bnd(coord, bnd)
         implicit none

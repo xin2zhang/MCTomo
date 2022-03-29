@@ -548,7 +548,7 @@ contains
                     alpha(1) = waterVel
                     beta(1) = 0
                     rho_k(1) = waterDensity
-                    thick(1) = grid%waterDepth
+                    thick(1) = model%waterdepth(j,i)
                 else
                     nlayers = 0
                 endif
@@ -614,7 +614,7 @@ contains
                 layer(j,i)%rho(1:nlayers) = rho_k(1:nlayers)
                 layer(j,i)%thick(1:nlayers) = thick(1:nlayers)/grid%scaling
                 ! waterDepth deos not scale, need to be recovered
-                if(grid%waterDepth>0) layer(j,i)%thick(1)=grid%waterDepth
+                if(grid%waterDepth>0) layer(j,i)%thick(1)=model%waterdepth(j,i)
 
                 !layer(j,i)%ax = 1
                 !layer(j,i)%ap = 1
@@ -644,7 +644,6 @@ contains
         enddo
     
     endfunction
-
 
     subroutine write_layer(layer,filename)
         use m_utils, only : write_resume_unit
