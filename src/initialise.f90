@@ -411,10 +411,10 @@ contains
     !        call readtxt(array,mcmc_set%prior_model)
     !        do i = 1, nx
     !            do j = 1, ny
-    !                mcmc_set%vpmin_array(:,j,i) = array(0,:)
-    !                mcmc_set%vpmax_array(:,j,i) = array(1,:)
-    !                mcmc_set%vsmin_array(:,j,i) = array(2,:)
-    !                mcmc_set%vsmax_array(:,j,i) = array(3,:)
+    !                mcmc_set%vpmin_array(:,j,i) = array(1,:)
+    !                mcmc_set%vpmax_array(:,j,i) = array(2,:)
+    !                mcmc_set%vsmin_array(:,j,i) = array(3,:)
+    !                mcmc_set%vsmax_array(:,j,i) = array(4,:)
     !            enddo
     !        enddo
     !    endif

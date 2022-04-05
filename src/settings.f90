@@ -195,10 +195,10 @@ contains
             call readtxt(array,mcmc_set%prior_model)
             do i = 1, nx
                 do j = 1, ny
-                    model%vpmin_array(:,j,i) = array(0,:)
-                    model%vpmax_array(:,j,i) = array(1,:)
-                    model%vsmin_array(:,j,i) = array(2,:)
-                    model%vsmax_array(:,j,i) = array(3,:)
+                    model%vpmin_array(:,j,i) = array(1,:)
+                    model%vpmax_array(:,j,i) = array(2,:)
+                    model%vsmin_array(:,j,i) = array(3,:)
+                    model%vsmax_array(:,j,i) = array(4,:)
                 enddo
             enddo
         endif
@@ -250,6 +250,8 @@ contains
         prior_check = .false.
         if(any(model%vp < model%vpmin_array) .or. any(model%vp > model%vpmax_array) &
             .or. any(model%vs < model%vsmin_array) .or. any(model%vs > model%vsmax_array) )then
+            !write(*,*) model%vp-model%vpmin_array
+            !write(*,*) model%vs-model%vsmin_array
             prior_check = .true.
         endif
         

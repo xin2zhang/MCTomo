@@ -128,9 +128,9 @@ contains
         real(kind=c_double), dimension(:,:,:), intent(out) :: rho
 
         ! crust
-        !rho = 2.35 +  0.036*(vp-3)**2
+        rho = 2.35 +  0.036*(vp-3)**2
         ! sedimentary
-        rho = 1.74*vp**0.25
+        !rho = 1.74*vp**0.25
     end subroutine
 
     function itoa4(n) result(newstring)

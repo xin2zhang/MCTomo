@@ -624,6 +624,8 @@ contains
         !$omp end do
         !$omp end parallel
 
+        !call write_layers(layer,'layers.txt')
+
         return
 
     end subroutine
