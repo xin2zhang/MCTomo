@@ -92,16 +92,17 @@ contains
 
     end subroutine likelihood
 
-    subroutine update_lgP_grads(dat,RTI,like_set,like)
+    subroutine update_lgP_grads(dat,model,RTI,like_set,like)
         implicit none
         type(T_DATA), dimension(:), intent(in) :: dat
+        type(T_MOD), intent(in)                :: model
         type(T_RUN_INFO), intent(inout) :: RTI
         type(T_LIKE_SET), intent(in) :: like_set
         type(T_LIKE), intent(inout) :: like
 
         select case (like_set%datatype)
         case (0,1)
-            call body_likelihood_grads(dat(1),RTI,like_set,like%likelihoods(1))
+            call body_likelihood_grads(dat(1),model,RTI,like_set,like%likelihoods(1))
             like%like = like%likelihoods(1)%like
             like%misfit = like%likelihoods(1)%misfit
             like%unweighted_misfit = like%likelihoods(1)%unweighted_misfit
@@ -117,7 +118,7 @@ contains
             like%unweighted_misfit = like%likelihoods(1)%unweighted_misfit
             like%grads(1:RTI%ncells) = like%likelihoods(1)%grads(1:RTI%ncells)
         case (3)
-            call body_likelihood_grads(dat(1),RTI,like_set,like%likelihoods(1))
+            call body_likelihood_grads(dat(1),model,RTI,like_set,like%likelihoods(1))
             call surf_likelihood_grads(dat(2),RTI,like_set,like%likelihoods(2))
             like%like = like%likelihoods(1)%like + like%likelihoods(2)%like
             like%misfit = like%likelihoods(1)%misfit + like%likelihoods(2)%misfit

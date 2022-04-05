@@ -257,8 +257,8 @@ contains
         call create_hmcsamples(hmcsamples,RTI%nsamples, dat, mcmc_set)
         call setup_hmc(mcmc_set,dat(1)%nsrc, hmc_set)
         grid = mcmc_set%grid
-        call mod_setup(model, grid)
-        call mod_setup(model_copy, grid)
+        call mod_setup(model, mcmc_set)
+        call mod_setup(model_copy, mcmc_set)
 
         ! initialize points and parameters corresponding to the current delaunay
 
@@ -333,7 +333,7 @@ contains
                 RTI%samplecount(ptype) = RTI%samplecount(ptype) + 1
                 !samples(iter)%step = ptype
 
-                call cell_birth(delaunay_ptr,RTI,mcmc_set,&
+                call cell_birth(delaunay_ptr,RTI,model,mcmc_set,&
                                 point,pm,bnd_box,prob,lerr)
                 if(.not.lerr) goto 100
                 call kdtree_to_grid(RTI,grid,bnd_box,model)
@@ -485,7 +485,7 @@ contains
 
                 ! using hmc step
                 call prepare_hmc(mcmc_set,RTI,dat(1)%src, hmc_set,qvals_in,ndim)
-                call hmc_step(dat,RTI,like_set,hmc_set,qvals_in(1:ndim), like, accepted)
+                call hmc_step(dat,model, RTI,like_set,hmc_set,qvals_in(1:ndim), like, accepted)
                 ! accept or not based on acceptance ratio
                 if(accepted) then
                     ! rebuild delaunay triangulation

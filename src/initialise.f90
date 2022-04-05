@@ -14,7 +14,7 @@ module m_initialise
                                last_dir, resume_dir, ini_dir, FILEDIR_SEPARATOR, create_dir, init_random_seed_internal
     use m_likelihood,   only : T_LIKE, like_setup, likelihood
     use mt19937,        only : grnd, init_genrand, unirand
-    use m_settings,     only : T_MCMC_SET, T_GRID, T_MOD, mod_setup, settings_check
+    use m_settings,     only : T_MCMC_SET, T_GRID, T_MOD, mod_setup, settings_check, prior_check
     use like_settings,  only : T_DATA, T_LIKE_SET, read_data, read_sources
     use run_info,       only : T_SAMPLE, init_samples, init_sample, T_RUN_INFO,&
                                init_run_info, read_info, write_info, read_samples, write_samples
@@ -146,7 +146,7 @@ contains
             t1 = omp_get_wtime()
             if(mcmc_set%initialise==2)then
                 call read_txt_vertices(RTI,mcmc_set%initial_model)
-                call mod_setup(model, grid)
+                call mod_setup(model, mcmc_set)
                 call kdtree_to_grid(RTI, grid, bnd_box, model)
                 call likelihood( dat,model,RTI,bnd_box,like_set,initial_like )
                 if( abs(initial_like%like-huge(initial_like%like)) < eps )then
@@ -321,7 +321,7 @@ contains
         call log_msg('Generating an initial model...')
         initial_ncells = int( mcmc_set%ncell_min+unirand(RTI%randcount)*(mcmc_set%ncell_max-mcmc_set%ncell_min) )
         RTI%ncells = initial_ncells
-        call mod_setup(model, grid)
+        call mod_setup(model, mcmc_set)
         call like_setup(initial_like,dat,like_set,mcmc_set%ncell_max ) 
     
         ! if 1d initial model
@@ -337,7 +337,7 @@ contains
         bnd_box(2) = d3( grid%xmax, grid%ymax, grid%zmax )
         count_init_num = 0
         do while( abs(initial_like%like-huge(initial_like%like)) < EPS .and. &
-                count_init_num < max_init_num)
+                count_init_num < max_init_num )
             call log_msg('Generating...')
             count_init_num =  count_init_num + 1
             do i = 1, initial_ncells
@@ -374,12 +374,51 @@ contains
                 !parameters(i)%vp = vs2vp(parameters(i)%vs)
                 RTI%parameters(3,i) = vp2rho(RTI%parameters(1,i))
             enddo
-    
+
             call kdtree_to_grid(RTI, grid, bnd_box, model)
+
+            if(prior_check(model)) cycle
+
             call likelihood( dat,model,RTI,bnd_box,like_set,initial_like)
         enddo
 
     endsubroutine generate_model
+
+    !subroutine init_prior(mcmc_set)
+    !    implicit none
+    !    type(T_MCMC_SET), intent(inout) :: mcmc_set
+
+    !    integer nz, ny, nx, i, j
+	!    logical lexist
+    !    real(kind=ii10), dimension(:,:), allocatable :: array
+
+    !    nz = mcmc_set%grid%nz
+    !    ny = mcmc_set%grid%ny
+    !    nx = mcmc_set%grid%nx
+    !    allocate(mcmc_set%vpmin_array(nz,ny,nx))
+    !    allocate(mcmc_set%vpmax_array(nz,ny,nx))
+    !    allocate(mcmc_set%vsmin_array(nz,ny,nx))
+    !    allocate(mcmc_set%vsmax_array(nz,ny,nx))
+
+    !    inquire(file=mcmc_set%prior_model,exist=lexist)
+    !    if(.not.lexist)then
+    !        call log_msg('No prior file found, using scalar prior')
+    !        mcmc_set%vpmin_array = mcmc_set%vpmin
+    !        mcmc_set%vpmax_array = mcmc_set%vpmax
+    !        mcmc_set%vsmin_array = mcmc_set%vsmin
+    !        mcmc_set%vsmax_array = mcmc_set%vsmax
+    !    else
+    !        call readtxt(array,mcmc_set%prior_model)
+    !        do i = 1, nx
+    !            do j = 1, ny
+    !                mcmc_set%vpmin_array(:,j,i) = array(0,:)
+    !                mcmc_set%vpmax_array(:,j,i) = array(1,:)
+    !                mcmc_set%vsmin_array(:,j,i) = array(2,:)
+    !                mcmc_set%vsmax_array(:,j,i) = array(3,:)
+    !            enddo
+    !        enddo
+    !    endif
+    !end subroutine
 
     subroutine readtxt(array, filename)
         use m_utils, only : read_resume_unit, read_doubles

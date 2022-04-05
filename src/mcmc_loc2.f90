@@ -7,7 +7,7 @@ module m_mcmc
     use m_exception, only       : exception_raiseError
     use m_logger, only          : log_msg
     use m_utils, only           : ii10, itoa, rtoa, delete_file, vs2vp, vp2rho, results_dir, last_dir, resume_dir, FILEDIR_SEPARATOR
-    use m_settings, only        : T_MCMC_SET, T_GRID, T_MOD, mod_setup
+    use m_settings, only        : T_MCMC_SET, T_GRID, T_MOD, mod_setup, point2idx, prior_check
     use like_settings, only     : T_LIKE_SET, T_DATA, write_sources
     use m_likelihood, only      : likelihood, T_LIKE, like_setup, noise_likelihood, location_likelihood
     use run_info, only          : T_RUN_INFO, T_SAMPLE, write_info, write_samples
@@ -128,8 +128,8 @@ contains
         call delete_file(trim(resume_dir)//FILEDIR_SEPARATOR//'run_time_sample_'//itoa(mcmc_set%processor)//'.dat')
         ! initialize and allocate several variables
         grid = mcmc_set%grid
-        call mod_setup(model, grid)
-        call mod_setup(model_copy, grid)
+        call mod_setup(model, mcmc_set)
+        call mod_setup(model_copy, mcmc_set)
 
         ! initialize points and parameters corresponding to the current delaunay
 
@@ -217,11 +217,12 @@ contains
                 RTI%samplecount(ptype) = RTI%samplecount(ptype) + 1
                 samples(iter)%step = ptype
 
-                call cell_birth(delaunay_ptr,RTI,mcmc_set,&
+                call cell_birth(delaunay_ptr,RTI,model,mcmc_set,&
                             point,pm,bnd_box,prob,lerr)
                 if(.not.lerr) goto 100
                 call kdtree_to_grid(RTI,grid,bnd_box,model)
                 if(all(RTI%sites_id==sites_id_copy)) goto 100
+                if(prior_check(model)) goto 100
 
                 ! calculate travel time and likelihood value
                 !call cpu_time(t1)
@@ -277,6 +278,7 @@ contains
                     RTI%sites_id = RTI%sites_id - 1
                 endwhere
                 call kdtree_to_grid(RTI,grid,bnd_box,model)
+                if(prior_check(model)) goto 100
 
                 ! calculate travel time and likelihood value
                 call likelihood(dat,model,RTI,bnd_box,like_set,like)
@@ -326,6 +328,7 @@ contains
                 ! convert voronoi to grid
                 if(lerr) then
                     call kdtree_to_grid(RTI,grid,bnd_box,model)
+                    if(prior_check(model)) goto 100
                     ! calculate travel time and likelihood value
                     call likelihood(dat,model,RTI,bnd_box,like_set,like)
                     ! calculate acceptance ratio
@@ -389,10 +392,11 @@ contains
                 else
                     ! Metropolis-Hastings 
                     ! change a velocity
-                    call vel_change(delaunay_ptr,RTI,mcmc_set,ivalue,pm_src,pm,bnd_box,lerr)
+                    call vel_change(delaunay_ptr,RTI,model,mcmc_set,ivalue,pm_src,pm,bnd_box,lerr)
                     ! accept or not based on acceptance ratio
                     if(lerr) then
                         call kdtree_to_grid(RTI,grid,bnd_box,model,pm_src)
+                        if(prior_check(model)) goto 100
                         ! calculate travel time and likelihood value
                         call likelihood(dat,model,RTI,bnd_box,like_set,like)
                         ! calculate acceptance ratio
@@ -753,8 +757,8 @@ contains
         call delete_file(trim(resume_dir)//FILEDIR_SEPARATOR//'run_time_temperatures_'//itoa(mcmc_set%processor)//'.dat')
         ! initialize and allocate several variables
         grid = mcmc_set%grid
-        call mod_setup(model, grid)
-        call mod_setup(model_copy, grid)
+        call mod_setup(model, mcmc_set)
+        call mod_setup(model_copy, mcmc_set)
 
         ! initialize tempering variable
         likelihood_t1 = 0.0
@@ -849,11 +853,12 @@ contains
                 RTI%samplecount(ptype) = RTI%samplecount(ptype) + 1
                 samples(iter)%step = ptype
 
-                call cell_birth(delaunay_ptr,RTI,mcmc_set,&
+                call cell_birth(delaunay_ptr,RTI,model,mcmc_set,&
                                 point,pm,bnd_box,prob,lerr)
                 if(.not.lerr) goto 100
                 call kdtree_to_grid(RTI,grid,bnd_box,model)
                 if(all(RTI%sites_id==sites_id_copy)) goto 100
+                if(prior_check(model)) goto 100
 
                 ! calculate travel time and likelihood value
                 !call cpu_time(t1)
@@ -909,6 +914,7 @@ contains
                     RTI%sites_id = RTI%sites_id - 1
                 endwhere
                 call kdtree_to_grid(RTI,grid,bnd_box,model)
+                if(prior_check(model)) goto 100
 
                 ! calculate travel time and likelihood value
                 call likelihood(dat,model,RTI,bnd_box,like_set,like)
@@ -958,6 +964,7 @@ contains
                 ! convert voronoi to grid
                 if(lerr) then
                     call kdtree_to_grid(RTI,grid,bnd_box,model)
+                    if(prior_check(model)) goto 100
                     ! calculate travel time and likelihood value
                     call likelihood(dat,model,RTI,bnd_box,like_set,like)
                     ! calculate acceptance ratio
@@ -1022,10 +1029,11 @@ contains
                 else
                     ! Metropolis-Hastings
                     ! change a velocity
-                    call vel_change(delaunay_ptr,RTI,mcmc_set,ivalue,pm_src,pm,bnd_box,lerr)
+                    call vel_change(delaunay_ptr,RTI,model,mcmc_set,ivalue,pm_src,pm,bnd_box,lerr)
                     ! accept or not based on acceptance ratio
                     if(lerr) then
                         call kdtree_to_grid(RTI,grid,bnd_box,model,pm_src)
+                        if(prior_check(model)) goto 100
                         ! calculate travel time and likelihood value
                         call likelihood(dat,model,RTI,bnd_box,like_set,like)
                         ! calculate acceptance ratio
@@ -1512,7 +1520,7 @@ contains
 
     endfunction
 
-    subroutine cell_birth(delaunay_ptr,RTI,mcmc_set,point,pm,bnd_box,prob,lerr)
+    subroutine cell_birth(delaunay_ptr,RTI,model,mcmc_set,point,pm,bnd_box,prob,lerr)
         implicit none
 
         type(c_ptr), intent(inout)              :: delaunay_ptr
@@ -1523,12 +1531,15 @@ contains
         real(kind=ii10), intent(out)            :: prob
         logical, intent(out)                    :: lerr
         type(T_RUN_INFO), intent(inout)         :: RTI
+        type(T_MOD), intent(in)                 :: model
 
         ! local variable
         type(d3) :: p0, p1
         real(c_double) :: x, y, z
         real(c_double) :: vp, vs, rho
         integer(c_size_t)  :: ncells
+        real(kind=ii10), dimension(3) :: pt
+        integer(c_int) :: ix, iy, iz
         ! debug    
 
         ncells = delaunay_size(delaunay_ptr)
@@ -1541,6 +1552,11 @@ contains
         x = mcmc_set%grid%xmin + unirand(RTI%randcount)*(mcmc_set%grid%xmax-mcmc_set%grid%xmin)
         y = mcmc_set%grid%ymin + unirand(RTI%randcount)*(mcmc_set%grid%ymax-mcmc_set%grid%ymin)
         z = mcmc_set%grid%zmin + unirand(RTI%randcount)*(mcmc_set%grid%zmax-mcmc_set%grid%zmin)
+        pt(1) = x
+        pt(2) = y
+        pt(3) = z
+        call point2idx(mcmc_set%grid,pt,ix,iy,iz)
+
         ! gaussian
         if(mcmc_set%kernel == 0) then
             call cgal_delaunay_locate(delaunay_ptr,d3(x,y,z),pm)
@@ -1560,8 +1576,8 @@ contains
 
         else
             ! prior
-            vs = mcmc_set%vsmin + unirand(RTI%randcount)*(mcmc_set%vsmax-mcmc_set%vsmin)
-            vp = mcmc_set%vpmin + unirand(RTI%randcount)*(mcmc_set%vpmax-mcmc_set%vpmin)
+            vs = model%vsmin_array(iz,iy,ix) + unirand(RTI%randcount)*(model%vsmax_array(iz,iy,ix)-model%vsmin_array(iz,iy,ix))
+            vp = model%vpmin_array(iz,iy,ix) + unirand(RTI%randcount)*(model%vpmax_array(iz,iy,ix)-model%vpmin_array(iz,iy,ix))
             !rho = mcmc_set%rhomin + unirand(RTI%randcount)*(mcmc_set%rhomax-mcmc_set%rhomin)
             if(mcmc_set%datatype==2) vp=vs2vp(vs)
             rho = vp2rho(vp)
@@ -1569,8 +1585,8 @@ contains
         endif
 
 
-        if( vs<mcmc_set%vsmin .or. vs>mcmc_set%vsmax .or. &
-            vp<mcmc_set%vpmin .or. vp>mcmc_set%vpmax .or. &
+        if( vs<model%vsmin_array(iz,iy,ix) .or. vs>model%vsmax_array(iz,iy,ix) .or. &
+            vp<model%vpmin_array(iz,iy,ix) .or. vp>model%vpmax_array(iz,iy,ix) .or. &
             vp<1.1*vs) then
             lerr = .false.
             prob = 0
@@ -1758,7 +1774,7 @@ contains
 
     end subroutine cell_move
 
-    subroutine vel_change(delaunay_ptr,RTI,mcmc_set,ivalue,pm_src,pm,bnd_box,lerr)
+    subroutine vel_change(delaunay_ptr,RTI,model,mcmc_set,ivalue,pm_src,pm,bnd_box,lerr)
         implicit none
 
         type(c_ptr), intent(inout)              :: delaunay_ptr
@@ -1768,12 +1784,15 @@ contains
         type(d3), dimension(:), intent(out)     :: bnd_box
         logical, intent(out)                    :: lerr
         type(T_RUN_INFO), intent(inout)         :: RTI
+        type(T_MOD), intent(in)                 :: model
 
         ! local
         type(p3) :: pm_dst
         type(d3) :: pt_src 
         type(d3) :: p0, p1
         integer(c_int) :: verbose
+        real(kind=ii10), dimension(3) :: pt
+        integer(c_int) :: ix, iy, iz
         ! debug
 
         ivalue = ceiling(unirand(RTI%randcount)*delaunay_size(delaunay_ptr))
@@ -1783,19 +1802,26 @@ contains
         pt_src%y = RTI%points(2,ivalue)
         pt_src%z = RTI%points(3,ivalue)
 
-        pm_dst%vs = RTI%parameters(2,ivalue) + gasdev(RTI%randcount)*mcmc_set%sigma_vs
-        pm_dst%vp = RTI%parameters(1,ivalue) + gasdev(RTI%randcount)*mcmc_set%sigma_vp
+        pt(1) = pt_src%x
+        pt(2) = pt_src%y
+        pt(3) = pt_src%z
+        call point2idx(mcmc_set%grid,pt,ix,iy,iz)
+
+        pm_dst%vs = RTI%parameters(2,ivalue) + &
+            gasdev(RTI%randcount)*mcmc_set%sigma_vs*(model%vsmax_array(iz,iy,ix)-model%vsmin_array(iz,iy,ix))/100.0
+        pm_dst%vp = RTI%parameters(1,ivalue) + &
+            gasdev(RTI%randcount)*mcmc_set%sigma_vp*(model%vpmax_array(iz,iy,ix)-model%vpmin_array(iz,iy,ix))/100.0
         if(pt_src%z>(mcmc_set%grid%zmin+mcmc_set%grid%zmax)/2) &
-            pm_dst%vs = RTI%parameters(2,ivalue) + gasdev(RTI%randcount)*mcmc_set%sigma_vs2
-            pm_dst%vp = RTI%parameters(1,ivalue) + gasdev(RTI%randcount)*mcmc_set%sigma_vp2
+            pm_dst%vs = RTI%parameters(2,ivalue) + gasdev(RTI%randcount)*mcmc_set%sigma_vs2*(model%vsmax_array(iz,iy,ix)-model%vsmin_array(iz,iy,ix))/100.0
+            pm_dst%vp = RTI%parameters(1,ivalue) + gasdev(RTI%randcount)*mcmc_set%sigma_vp2*(model%vpmax_array(iz,iy,ix)-model%vpmin_array(iz,iy,ix))/100.0
         if(mcmc_set%datatype==2) pm_dst%vp = vs2vp(pm_dst%vs)
         pm_dst%rho = vp2rho(pm_dst%vp)
         !dev%vp = gasdev(RTI%randcount)*mcmc_set%sigma_vp
         !dev%rho = gasdev(RTI%randcount)*mcmc_set%sigma_rho
 
         ! out of prior or vp<1.1*vs (vp is generally bigger than vs)
-        if( pm_dst%vs<mcmc_set%vsmin .or. pm_dst%vs>mcmc_set%vsmax .or.&
-            pm_dst%vp<mcmc_set%vpmin .or. pm_dst%vp>mcmc_set%vpmax .or.&
+        if( pm_dst%vs<model%vsmin_array(iz,iy,ix) .or. pm_dst%vs>model%vsmax_array(iz,iy,ix) .or.&
+            pm_dst%vp<model%vpmin_array(iz,iy,ix) .or. pm_dst%vp>model%vpmax_array(iz,iy,ix) .or.&
             pm_dst%vp<pm_dst%vs*1.1) then
             lerr = .false.
             return

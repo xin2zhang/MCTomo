@@ -24,6 +24,7 @@ module m_body_likelihood
 
     public :: body_likelihood, body_noise_likelihood, body_location_likelihood
     public :: body_likelihood_grads
+    public :: point2idx
 
     ! debug
     real( kind=ii10 ) :: t1, t2
@@ -336,10 +337,11 @@ contains
 
     end subroutine body_likelihood
 
-    subroutine body_likelihood_grads(dat,RTI,settings,like)
+    subroutine body_likelihood_grads(dat,model,RTI,settings,like)
     
         implicit none
         type(T_DATA), intent(in)                    :: dat
+        type(T_MOD), intent(in)                     :: model
         type(T_RUN_INFO), intent(inout)             :: RTI
         type(T_LIKE_SET), intent(in)                :: settings
         type(T_LIKE_BASE), intent(inout)            :: like
@@ -350,7 +352,6 @@ contains
 
         ! > local grid
         type(T_GRID) :: grid
-        type(T_MOD)  :: model
 
         integer nrr, nsites
         integer i, j, k
@@ -361,17 +362,6 @@ contains
         nsites = RTI%ncells
         grads_src = 0
         grads_src2 = 0
-
-        call mod_setup(model,settings%grid)
-        do i = 1, settings%grid%nx
-            do j = 1, settings%grid%ny
-                do k = 1, settings%grid%nz
-                    model%vp(k,j,i) = RTI%parameters(1,RTI%sites_id(k,j,i))
-                    model%vs(k,j,i) = RTI%parameters(2,RTI%sites_id(k,j,i))
-                    model%rho(k,j,i) = RTI%parameters(3,RTI%sites_id(k,j,i))
-                enddo
-            enddo
-        enddo
 
         ! noise level
         if(settings%sigdep /= 0)then

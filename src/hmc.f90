@@ -3,6 +3,7 @@
 module m_hmc
     use m_logger,      only : log_msg
     use m_utils,       only : ii10, rtoa
+    use m_settings,    only : T_MOD
     use like_settings, only : T_DATA, T_LIKE_SET
     use m_likelihood,  only : T_LIKE, update_lgP_grads
     use run_info,      only : T_RUN_INFO
@@ -31,9 +32,10 @@ module m_hmc
 
 contains
 
-    subroutine hmc_step(target_data, RTI, like_set, hmc_set, qvals_in, lgP,accept) 
+    subroutine hmc_step(target_data, model, RTI, like_set, hmc_set, qvals_in, lgP,accept) 
         implicit none
         type(T_DATA), dimension(:), intent(in)      :: target_data
+        type(T_MOD), intent(in)                     :: model
         type(T_RUN_INFO), intent(inout)             :: RTI
         type(T_LIKE_SET), intent(in)                :: like_set
         type(T_HMC_SET), intent(in)                 :: hmc_set
@@ -71,7 +73,7 @@ contains
         qvals_start =  qvals
 
         call log_msg('Beginning likelihood: '// rtoa(lgP%like))
-        call update_lgP_grads(target_data, RTI, like_set, lgP)
+        call update_lgP_grads(target_data, model, RTI, like_set, lgP)
         prev_U = posterior(qvals, lgP%like, hmc_set)
         call gradient(qvals, grad, lgP%grads(1:ndim), hmc_set)
 
@@ -98,7 +100,7 @@ contains
 
             ! update potential (-loglikelihood) and gradient
             call update_model(qvals, hmc_set, RTI, like_set)
-            call update_lgP_grads(target_data, RTI, like_set, lgP)
+            call update_lgP_grads(target_data, model, RTI, like_set, lgP)
             call gradient(qvals, grad, lgp%grads(1:ndim), hmc_set)
 
             pvals = pvals - hmc_set%stepsize(1:ndim) * grad / 2.0

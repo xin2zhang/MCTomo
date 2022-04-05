@@ -2,7 +2,7 @@
 !
 module m_settings
 
-    use iso_c_binding, only : c_size_t, c_int
+    use iso_c_binding, only : c_size_t, c_int, c_double
     use m_utils, only : ii10, STRLEN, itoa, eps
     use m_exception,only : exception_raiseError
     use m_logger, only          : log_msg
@@ -10,11 +10,12 @@ module m_settings
 
     private
 
-    public :: T_GRID, grid_setup
+    public :: T_GRID, grid_setup, point2idx
     public :: T_MOD, mod_setup
     public :: T_MCMC_SET
     public :: out_bnd
     public :: settings_check
+    public :: prior_check
 
     ! grid settings
     type T_GRID
@@ -32,6 +33,9 @@ module m_settings
     type T_MOD
         real( kind=ii10 ), dimension(:,:,:), allocatable :: vp, vs, rho
         real( kind=ii10 ), dimension(:,:), allocatable :: waterdepth
+        real(kind=ii10), dimension(:,:,:), allocatable :: vpmin_array, vpmax_array 
+        real(kind=ii10), dimension(:,:,:), allocatable :: vsmin_array, vsmax_array 
+        real(kind=ii10), dimension(:,:,:), allocatable :: rhomin_array, rhomax_array 
     end type T_MOD
 
     ! mcmc settings
@@ -55,6 +59,7 @@ module m_settings
         real(kind=ii10) :: vpmin, vpmax
         real(kind=ii10) :: vsmin, vsmax
         real(kind=ii10) :: rhomin, rhomax
+        character(len=STRLEN) :: prior_model
         !real(kind=ii10), dimension(3) :: pm1, pm2
         real(kind=ii10) :: bn0_min, bn0_max
         real(kind=ii10) :: bn1_min, bn1_max
@@ -124,15 +129,39 @@ contains
         endif
     end subroutine
 
-    subroutine mod_setup(model,grid)
+    pure subroutine point2idx(grid,point,ix,iy,iz)
+        implicit none
+        type(T_GRID), intent(in) :: grid
+        real(kind=c_double), dimension(3), intent(in) :: point
+        integer(c_int), intent(out) :: ix, iy, iz
+
+        ix = floor((point(1)-grid%xmin)/grid%dx) + 1
+        iy = floor((point(2)-grid%ymin)/grid%dy) + 1
+        iz = floor((point(3)-grid%zmin/grid%scaling)/(grid%dz/grid%scaling)) + 1
+        if(ix < 1) ix = 1
+        if(iy < 1) iy = 1
+        if(iz < 1) iz = 1
+        if(ix >= grid%nx) ix = grid%nx - 1
+        if(iy >= grid%ny) iy = grid%ny - 1
+        if(iz >= grid%nz) iz = grid%nz - 1
+
+    endsubroutine point2idx
+
+    subroutine mod_setup(model,mcmc_set)
         implicit none
         type(T_MOD), intent(out) :: model
-        type(T_GRID), intent(in) :: grid
+        type(T_MCMC_SET), intent(in) :: mcmc_set
 
-        !type(T_GRID) grid
-        !grid = mcmc_set%grid
+        type(T_GRID) grid
         integer ierr
+        integer nz, ny, nx, i, j
+	    logical lexist
+        real(kind=ii10), dimension(:,:), allocatable :: array
 
+        grid = mcmc_set%grid
+        nz = mcmc_set%grid%nz
+        ny = mcmc_set%grid%ny
+        nx = mcmc_set%grid%nx
         allocate( model%vp(grid%nz, grid%ny, grid%nx) )
         allocate( model%vs(grid%nz, grid%ny, grid%nx) )
         allocate( model%rho(grid%nz, grid%ny, grid%nx) )
@@ -143,11 +172,35 @@ contains
 
         allocate(model%waterdepth(grid%ny, grid%nx))
         model%waterdepth = 0
-        if(grid%waterDepth<eps)then
+        if(grid%waterDepth>eps)then
             call read_waterdepth(grid%waterdepthfile,model%waterdepth,ierr)
         endif
         if(ierr /= 0)then
             model%waterdepth = grid%waterDepth
+        endif
+
+        allocate(model%vpmin_array(nz,ny,nx))
+        allocate(model%vpmax_array(nz,ny,nx))
+        allocate(model%vsmin_array(nz,ny,nx))
+        allocate(model%vsmax_array(nz,ny,nx))
+
+        inquire(file=mcmc_set%prior_model,exist=lexist)
+        if(.not.lexist)then
+            call log_msg('No prior file found, using scalar prior')
+            model%vpmin_array = mcmc_set%vpmin
+            model%vpmax_array = mcmc_set%vpmax
+            model%vsmin_array = mcmc_set%vsmin
+            model%vsmax_array = mcmc_set%vsmax
+        else
+            call readtxt(array,mcmc_set%prior_model)
+            do i = 1, nx
+                do j = 1, ny
+                    model%vpmin_array(:,j,i) = array(0,:)
+                    model%vpmax_array(:,j,i) = array(1,:)
+                    model%vsmin_array(:,j,i) = array(2,:)
+                    model%vsmax_array(:,j,i) = array(3,:)
+                enddo
+            enddo
         endif
 
     end subroutine mod_setup
@@ -189,13 +242,26 @@ contains
 
     end function
 
+    ! check prior 
+    logical function prior_check(model)
+        implicit none
+        type(T_MOD), intent(in) :: model
+
+        prior_check = .false.
+        if(any(model%vp < model%vpmin_array) .or. any(model%vp > model%vpmax_array) &
+            .or. any(model%vs < model%vsmin_array) .or. any(model%vs > model%vsmax_array) )then
+            prior_check = .true.
+        endif
+        
+    end function
+
     ! default values for mcmc settings and check validity of settings
     subroutine settings_check(mcmc_set)
         implicit none
         type(T_MCMC_SET), intent(inout) :: mcmc_set
 
         ! check the validity of settings
-	logical lexist
+	    logical lexist
 
         if(mcmc_set%initialise==1)then
             inquire(file=mcmc_set%initial_model,exist=lexist)
@@ -267,5 +333,22 @@ contains
         mcmc_set%src_mass = 1
 
     endsubroutine
+
+    subroutine readtxt(array, filename)
+        use m_utils, only : read_resume_unit, read_doubles
+        implicit none
+        character(len=*), intent(in) :: filename
+        real(kind=ii10), dimension(:,:), allocatable, intent(out) :: array
+        integer n1, n2, i
+
+        open(unit=read_resume_unit,file=filename,status='old',action='read')
+        read(read_resume_unit,*) n1, n2
+        allocate(array(n2,n1))
+        do i = 1, n1
+            read(read_resume_unit,*) array(:,i)
+        enddo
+        close(read_resume_unit)
+    endsubroutine
+
 
 end module
