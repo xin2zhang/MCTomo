@@ -1580,6 +1580,8 @@ contains
             vp = model%vpmin_array(iz,iy,ix) + unirand(RTI%randcount)*(model%vpmax_array(iz,iy,ix)-model%vpmin_array(iz,iy,ix))
             !rho = mcmc_set%rhomin + unirand(RTI%randcount)*(mcmc_set%rhomax-mcmc_set%rhomin)
             if(mcmc_set%datatype==2) vp=vs2vp(vs)
+            if( mcmc_set%datatype==2 .and. vp<model%vpmin_array(iz,iy,ix) ) vp = model%vpmin_array(iz,iy,ix) 
+            if( mcmc_set%datatype==2 .and. vp>model%vpmax_array(iz,iy,ix) ) vp = model%vpmax_array(iz,iy,ix) 
             rho = vp2rho(vp)
             prob = 0
         endif
@@ -1814,7 +1816,11 @@ contains
         if(pt_src%z>(mcmc_set%grid%zmin+mcmc_set%grid%zmax)/2) &
             pm_dst%vs = RTI%parameters(2,ivalue) + gasdev(RTI%randcount)*mcmc_set%sigma_vs2*(model%vsmax_array(iz,iy,ix)-model%vsmin_array(iz,iy,ix))/100.0
             pm_dst%vp = RTI%parameters(1,ivalue) + gasdev(RTI%randcount)*mcmc_set%sigma_vp2*(model%vpmax_array(iz,iy,ix)-model%vpmin_array(iz,iy,ix))/100.0
-        if(mcmc_set%datatype==2) pm_dst%vp = vs2vp(pm_dst%vs)
+        if(mcmc_set%datatype==2)then
+            pm_dst%vp = vs2vp(pm_dst%vs)
+            if( pm_dst%vp<model%vpmin_array(iz,iy,ix) ) pm_dst%vp = model%vpmin_array(iz,iy,ix) 
+            if( pm_dst%vp>model%vpmax_array(iz,iy,ix) ) pm_dst%vp = model%vpmax_array(iz,iy,ix) 
+        endif
         pm_dst%rho = vp2rho(pm_dst%vp)
         !dev%vp = gasdev(RTI%randcount)*mcmc_set%sigma_vp
         !dev%rho = gasdev(RTI%randcount)*mcmc_set%sigma_rho

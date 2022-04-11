@@ -73,6 +73,12 @@ contains
             ! only surface waves are used, set the vp according to vs and
             ! density according to vp
             call vs2vp_3d(model%vs,model%vp)
+            where (model%vp<model%vpmin_array)
+                model%vp = model%vpmin_array
+            endwhere
+            where (model%vp>model%vpmax_array)
+                model%vp = model%vpmax_array
+            endwhere
             call vp2rho_3d(model%vp,model%rho)
             call surf_likelihood(dat(1),model,RTI,perturbed_box,like_set,like%likelihoods(1))
             like%like = like%likelihoods(1)%like
