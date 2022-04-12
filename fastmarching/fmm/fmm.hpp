@@ -118,7 +118,7 @@ template < class grid_t, class heap_t = FMDaryHeap<FMCell> >  class FMM : public
                 idxMin = narrow_band_.popMinIdx();
                 n_neighs = grid_->getNeighbors(idxMin, neighbors_);
                 grid_->getCell(idxMin).setState(FMState::FROZEN);
-                assert(!isinf(grid_->getCell(idxMin).getArrivalTime()));
+                assert(!std::isinf(grid_->getCell(idxMin).getArrivalTime()));
                 for (unsigned int s = 0; s < n_neighs; ++s) {
                     j = neighbors_[s];
                     if ((grid_->getCell(j).getState() == FMState::FROZEN) || grid_->getCell(j).isOccupied())
@@ -141,7 +141,7 @@ template < class grid_t, class heap_t = FMDaryHeap<FMCell> >  class FMM : public
                             if (utils::isTimeBetterThan(new_arrival_time, grid_->getCell(j).getArrivalTime())) {
                                 grid_->getCell(j).setArrivalTime(new_arrival_time);
                                 narrow_band_.increase( &(grid_->getCell(j)) );
-                                assert(!isinf(new_arrival_time));
+                                assert(!std::isinf(new_arrival_time));
                             }
                         }
                         else {

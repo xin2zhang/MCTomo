@@ -54,7 +54,7 @@ class EikonalSolver : public Solver<grid_t>{
 
             for (unsigned int dim = 0; dim < grid_t::getNDims(); ++dim) {
                 double minTInDim = grid_->getMinValueInDim(idx, dim);
-                if (!isinf(minTInDim) && minTInDim < grid_->getCell(idx).getArrivalTime())
+                if (!std::isinf(minTInDim) && minTInDim < grid_->getCell(idx).getArrivalTime())
                     Tvalues_.push_back({minTInDim,dim});
                 else
                     a -=1;
@@ -94,13 +94,13 @@ class EikonalSolver : public Solver<grid_t>{
                 for (auto const& neighbor : frozen_neighbor_idx) {
                     if(neighbor.first<std::numeric_limits<unsigned int>::max()){
                         double tvalue = grid_->getCell(neighbor.first).getArrivalTime();
-                        if(!isinf(tvalue) && tvalue < minT){
+                        if(!std::isinf(tvalue) && tvalue < minT){
                             minT = tvalue;
 
                             minT2 = std::numeric_limits<double>::max();
                             if(neighbor.second<std::numeric_limits<unsigned int>::max()){
                                 double tvalue2 = grid_->getCell(neighbor.second).getArrivalTime();
-                                if(!isinf(tvalue2) && tvalue2 <= tvalue) minT2 = tvalue2;
+                                if(!std::isinf(tvalue2) && tvalue2 <= tvalue) minT2 = tvalue2;
                             }
                         }
                     }
@@ -126,7 +126,7 @@ class EikonalSolver : public Solver<grid_t>{
             for (unsigned i = 1; i <= a; ++i) {
                 double currentT = highAccuracySolveEikonalNDims(idx, i);
                 // throw invalid time
-                if(!isinf(currentT)) updatedT = currentT;
+                if(!std::isinf(currentT)) updatedT = currentT;
                 // If no more dimensions or increasing one dimension will not improve time.
                 if (i == a || (currentT - T2values_[i].first.first) < utils::COMP_MARGIN)
                     break;
@@ -134,13 +134,13 @@ class EikonalSolver : public Solver<grid_t>{
             for (unsigned i = a; i >=1; --i) {
                 double currentT = highAccuracySolveEikonalNDims(idx, i);
                 // if time is not inf and is valid
-                if(!isinf(currentT) && (currentT - T2values_[i-1].first.first) > utils::COMP_MARGIN){
+                if(!std::isinf(currentT) && (currentT - T2values_[i-1].first.first) > utils::COMP_MARGIN){
                     updatedT = currentT;
                     break;
                 }
             }
             assert(updatedT>0);
-            assert(!isinf(updatedT));
+            assert(!std::isinf(updatedT));
             return updatedT;
         }
 
@@ -152,7 +152,7 @@ class EikonalSolver : public Solver<grid_t>{
             unsigned int frozen_neighbor_count = 0;
             for (unsigned int dim = 0; dim < grid_t::getNDims(); ++dim) {
                 double minTInDim = grid_->getMinValueInDim(idx, dim);
-                if (!isinf(minTInDim))
+                if (!std::isinf(minTInDim))
                     frozen_neighbor_times[frozen_neighbor_count++] = {minTInDim, dim};
             }
 
@@ -210,13 +210,13 @@ class EikonalSolver : public Solver<grid_t>{
                 for (auto const& neighbor : frozen_neighbor_idx) {
                     if(neighbor.first<std::numeric_limits<unsigned int>::max()){
                         double tvalue = grid_->getCell(neighbor.first).getArrivalTime();
-                        if(!isinf(tvalue) && tvalue < minT){
+                        if(!std::isinf(tvalue) && tvalue < minT){
                             minT = tvalue;
 
                             minT2 = std::numeric_limits<double>::max();
                             if(neighbor.second<std::numeric_limits<unsigned int>::max()){
                                 double tvalue2 = grid_->getCell(neighbor.second).getArrivalTime();
-                                if(!isinf(tvalue2) && tvalue2 <= tvalue) minT2 = tvalue2;
+                                if(!std::isinf(tvalue2) && tvalue2 <= tvalue) minT2 = tvalue2;
                             }
                         }
                     }
@@ -250,7 +250,7 @@ class EikonalSolver : public Solver<grid_t>{
                     unsigned int j = frozen_neighbor_times[i].second;
                     double tvalue = frozen_neighbor_times[i].first.first;
                     double tvalue2 = frozen_neighbor_times[i].first.second;
-                    if (!isinf(tvalue2)) {
+                    if (!std::isinf(tvalue2)) {
                         // second order coefficients
                         double alpha = 9.0/4.0 / (grid_spacing[j] * grid_spacing[j] );
                         double t = (4.0*tvalue - tvalue2)/3.0;
@@ -342,7 +342,7 @@ class EikonalSolver : public Solver<grid_t>{
                 unsigned int j = T2values_[i].second;
                 double tvalue = T2values_[i].first.first;
                 double tvalue2 = T2values_[i].first.second;
-                if (!isinf(tvalue2)) {
+                if (!std::isinf(tvalue2)) {
                     // second order coefficients
                     double alpha = 9.0/4.0 / (grid_spacing[j] * grid_spacing[j] );
                     double t = (4.0*tvalue - tvalue2)/3.0;

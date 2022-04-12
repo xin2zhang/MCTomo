@@ -584,6 +584,12 @@ contains
             samples(iter)%unweighted_misfit = like%unweighted_misfit
             src_samples(:,:,iter) = RTI%locations
 
+            if(mod(iter,mcmc_set%thin) == 0)then
+                bnd_box(1) = d3(grid%xmin,grid%ymin,grid%zmin)
+                bnd_box(2) = d3(grid%xmax,grid%ymax,grid%zmax)
+                call kdtree_to_grid(RTI, grid, bnd_box, model)
+            endif
+
             ! if after burn-in, begin sampling
             if(RTI%sampletotal > mcmc_set%burn_in .and.&
             mod(RTI%sampletotal-mcmc_set%burn_in,mcmc_set%thin)==0)then
