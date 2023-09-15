@@ -31,3 +31,7 @@
 *.out
 *.app
 bin/
+fm2d/*.a
+fm2d/*.so
+surfmodes/*.a
+surfmodes/*.so
