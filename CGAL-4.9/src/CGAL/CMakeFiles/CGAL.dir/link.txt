@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC  -frounding-math -O3 -DNDEBUG  -L/exports/igmm/software/pkg/el7/libs/boost/1.59.0/lib -shared -Wl,-soname,libCGAL.so.12 -o ../../lib/libCGAL.so.12.0.0 CMakeFiles/CGAL.dir/all_files.cpp.o -lmpfr -lgmp -lboost_thread -lboost_system 
