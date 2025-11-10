@@ -155,7 +155,7 @@ contains
         type(T_GRID) grid
         integer ierr
         integer nz, ny, nx, i, j
-	    logical lexist
+        logical lexist
         real(kind=ii10), dimension(:,:), allocatable :: array
 
         grid = mcmc_set%grid

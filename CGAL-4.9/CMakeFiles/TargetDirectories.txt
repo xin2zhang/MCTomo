@@ -1,6 +1,0 @@
-/exports/csce/datastore/geos/groups/eddie_geos_eps_eip/geos_eps_eip_backedup/Xin/CGAL-4.9/CMakeFiles/demos.dir
-/exports/csce/datastore/geos/groups/eddie_geos_eps_eip/geos_eps_eip_backedup/Xin/CGAL-4.9/CMakeFiles/examples.dir
-/exports/csce/datastore/geos/groups/eddie_geos_eps_eip/geos_eps_eip_backedup/Xin/CGAL-4.9/CMakeFiles/install_FindCGAL.dir
-/exports/csce/datastore/geos/groups/eddie_geos_eps_eip/geos_eps_eip_backedup/Xin/CGAL-4.9/src/CGAL_ImageIO/CMakeFiles/CGAL_ImageIO.dir
-/exports/csce/datastore/geos/groups/eddie_geos_eps_eip/geos_eps_eip_backedup/Xin/CGAL-4.9/src/CGAL_Core/CMakeFiles/CGAL_Core.dir
-/exports/csce/datastore/geos/groups/eddie_geos_eps_eip/geos_eps_eip_backedup/Xin/CGAL-4.9/src/CGAL/CMakeFiles/CGAL.dir

@@ -1,8 +1,0 @@
-#include "/exports/csce/datastore/geos/groups/eddie_geos_eps_eip/geos_eps_eip_backedup/Xin/CGAL-4.9/src/CGAL_Core/BigFloat.cpp"
-#include "/exports/csce/datastore/geos/groups/eddie_geos_eps_eip/geos_eps_eip_backedup/Xin/CGAL-4.9/src/CGAL_Core/CoreAux.cpp"
-#include "/exports/csce/datastore/geos/groups/eddie_geos_eps_eip/geos_eps_eip_backedup/Xin/CGAL-4.9/src/CGAL_Core/CoreDefs.cpp"
-#include "/exports/csce/datastore/geos/groups/eddie_geos_eps_eip/geos_eps_eip_backedup/Xin/CGAL-4.9/src/CGAL_Core/CoreIO.cpp"
-#include "/exports/csce/datastore/geos/groups/eddie_geos_eps_eip/geos_eps_eip_backedup/Xin/CGAL-4.9/src/CGAL_Core/Expr.cpp"
-#include "/exports/csce/datastore/geos/groups/eddie_geos_eps_eip/geos_eps_eip_backedup/Xin/CGAL-4.9/src/CGAL_Core/GmpIO.cpp"
-#include "/exports/csce/datastore/geos/groups/eddie_geos_eps_eip/geos_eps_eip_backedup/Xin/CGAL-4.9/src/CGAL_Core/Real.cpp"
-#include "/exports/csce/datastore/geos/groups/eddie_geos_eps_eip/geos_eps_eip_backedup/Xin/CGAL-4.9/src/CGAL_Core/extLong.cpp"
